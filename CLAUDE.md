@@ -161,46 +161,66 @@ String name = proxy.getName();  // 이 시점에 DB에서 로드
 
 ## 구현 단계
 
-### Phase 1: 기반 인프라
+### Phase 1: 메타데이터 & 매핑 (최우선 - 모든 것의 기반)
+**왜 먼저?** 메타데이터 없이는 아무것도 할 수 없음. DB 연결 없이도 구현/테스트 가능.
+
+#### Step 1.1: 애노테이션 정의
+- [ ] @Entity - 엔티티 클래스 표시
+- [ ] @Table - 테이블 이름 매핑
+- [ ] @Id - Primary Key 표시
+- [ ] @Column - 컬럼 매핑
+
+#### Step 1.2: EntityMetadata 구조 설계
+- [ ] EntityMetadata 클래스
+- [ ] AttributeMetadata 클래스
+- [ ] IdentifierMetadata 클래스
+- [ ] 테이블-컬럼 매핑 정보 저장
+
+#### Step 1.3: 리플렉션 기반 메타데이터 추출
+- [ ] AnnotationProcessor 구현
+- [ ] 클래스 스캔 및 애노테이션 읽기
+- [ ] 필드 정보 추출
+- [ ] 메타데이터 객체 생성
+
+#### Step 1.4: MetadataRegistry (메타데이터 저장소)
+- [ ] 메타데이터 캐싱
+- [ ] 클래스 → 메타데이터 조회
+- [ ] 테스트 엔티티로 검증
+
+### Phase 2: 기반 인프라
 - [ ] JDBC Connection 관리
 - [ ] Transaction 기본 구조
 - [ ] SQL 실행 엔진 (JdbcExecutor)
 - [ ] ResultSet 처리
 
-### Phase 2: 메타데이터 & 매핑
-- [ ] 애노테이션 정의 (@Entity, @Table, @Id, @Column)
-- [ ] 리플렉션 기반 메타데이터 추출
-- [ ] EntityMetadata 구조
-- [ ] 테이블-컬럼 매핑
-
-### Phase 3: 핵심 API
-- [ ] EntityManagerFactory 구현
-- [ ] EntityManager 구현
-- [ ] EntityTransaction 구현
-
-### Phase 4: 영속성 컨텍스트
-- [ ] PersistenceContext 구현
-- [ ] 1차 캐시 (IdentityMap)
-- [ ] Entity 상태 관리
-- [ ] ActionQueue (쓰기 지연)
-
-### Phase 5: CRUD 연산
-- [ ] persist() - INSERT
-- [ ] find() - SELECT by ID
-- [ ] merge() - UPDATE
-- [ ] remove() - DELETE
-- [ ] flush() - 동기화
-- [ ] Dirty Checking
-
-### Phase 6: SQL 생성 엔진
-- [ ] INSERT SQL 생성
+### Phase 3: SQL 생성 엔진
+- [ ] INSERT SQL 생성 (메타데이터 활용)
 - [ ] SELECT SQL 생성
 - [ ] UPDATE SQL 생성
 - [ ] DELETE SQL 생성
 - [ ] WHERE 절 생성
 
-### Phase 7: 쿼리 처리
-- [ ] JPQL 파서 (기본)
+### Phase 4: 핵심 API (최소 구현)
+- [ ] EntityManagerFactory 기본 구조
+- [ ] EntityManager 기본 구조
+- [ ] EntityTransaction 기본 구조
+
+### Phase 5: 영속성 컨텍스트
+- [ ] PersistenceContext 구현
+- [ ] 1차 캐시 (IdentityMap)
+- [ ] Entity 상태 관리 (EntityEntry)
+- [ ] ActionQueue (쓰기 지연)
+
+### Phase 6: CRUD 연산 (Persister)
+- [ ] persist() - INSERT 실행
+- [ ] find() - SELECT by ID 실행
+- [ ] merge() - UPDATE 실행
+- [ ] remove() - DELETE 실행
+- [ ] flush() - ActionQueue 실행
+- [ ] Dirty Checking
+
+### Phase 7: 쿼리 처리 (기본)
+- [ ] JPQL 파서 (간단한 SELECT만)
 - [ ] JPQL → SQL 변환
 - [ ] Query 인터페이스
 - [ ] TypedQuery
