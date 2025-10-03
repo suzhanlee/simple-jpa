@@ -6,10 +6,10 @@
 ## 구현 단계
 
 ### Step 1.1: 애노테이션 정의
-- [ ] @Entity - 엔티티 클래스 표시
-- [ ] @Table - 테이블 이름 매핑
-- [ ] @Id - Primary Key 표시
-- [ ] @Column - 컬럼 매핑
+- [x] @Entity - 엔티티 클래스 표시
+- [x] @Table - 테이블 이름 매핑
+- [x] @Id - Primary Key 표시
+- [x] @Column - 컬럼 매핑
 
 ### Step 1.2: EntityMetadata 구조 설계
 - [ ] EntityMetadata 클래스
