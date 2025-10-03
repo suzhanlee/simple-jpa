@@ -12,16 +12,16 @@
 - [x] @Column - 컬럼 매핑
 
 ### Step 1.2: EntityMetadata 구조 설계
-- [ ] EntityMetadata 클래스
-- [ ] AttributeMetadata 클래스
-- [ ] IdentifierMetadata 클래스
-- [ ] 테이블-컬럼 매핑 정보 저장
+- [x] EntityMetadata 클래스
+- [x] AttributeMetadata 클래스
+- [x] IdentifierMetadata 클래스
+- [x] 테이블-컬럼 매핑 정보 저장
 
 ### Step 1.3: 리플렉션 기반 메타데이터 추출
-- [ ] AnnotationProcessor 구현
-- [ ] 클래스 스캔 및 애노테이션 읽기
-- [ ] 필드 정보 추출
-- [ ] 메타데이터 객체 생성
+- [x] AnnotationProcessor 구현
+- [x] 클래스 스캔 및 애노테이션 읽기
+- [x] 필드 정보 추출
+- [x] 메타데이터 객체 생성
 
 ### Step 1.4: MetadataRegistry (메타데이터 저장소)
 - [ ] 메타데이터 캐싱

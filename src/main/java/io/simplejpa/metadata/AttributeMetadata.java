@@ -3,7 +3,6 @@ package io.simplejpa.metadata;
 import lombok.Getter;
 
 import java.lang.reflect.Field;
-import java.util.Map;
 
 /**
  * attribute metadata
