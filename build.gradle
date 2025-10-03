@@ -1,0 +1,28 @@
+plugins {
+    id 'java'
+}
+
+group = 'io.simplejpa'
+version = '1.0-SNAPSHOT'
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // 테스트 의존성
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.0'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    // H2 Database (테스트용)
+    testImplementation 'com.h2database:h2:2.2.224'
+}
+
+test {
+    useJUnitPlatform()
+}
