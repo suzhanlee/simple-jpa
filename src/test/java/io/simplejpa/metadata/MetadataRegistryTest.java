@@ -4,6 +4,7 @@ import io.simplejpa.annotation.Column;
 import io.simplejpa.annotation.Entity;
 import io.simplejpa.annotation.Id;
 import io.simplejpa.mapping.AnnotationProcessor;
+import lombok.NoArgsConstructor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -114,7 +115,9 @@ class MetadataRegistryTest {
 
         @Column(name = "email", nullable = false)
         private String email;
-    }
 
+        public User() {
+        }
+    }
 
 }
