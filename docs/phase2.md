@@ -23,10 +23,10 @@
 - 연결 오류 처리
 
 ### Step 2.2: Transaction 기본 구조
-- [ ] TransactionCoordinator 인터페이스
-- [ ] JdbcTransaction 구현
-- [ ] Transaction 상태 관리 (NOT_ACTIVE, ACTIVE, COMMITTED, ROLLED_BACK)
-- [ ] begin(), commit(), rollback() 메서드
+- [x] TransactionCoordinator 인터페이스
+- [x] JdbcTransaction 구현
+- [x] Transaction 상태 관리 (NOT_ACTIVE, ACTIVE, COMMITTED, ROLLED_BACK)
+- [x] begin(), commit(), rollback() 메서드
 
 **주요 컴포넌트**:
 - `TransactionCoordinator`: 트랜잭션 조정 인터페이스
