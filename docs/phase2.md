@@ -41,10 +41,10 @@
 - 트랜잭션 상태 추적
 
 ### Step 2.3: SQL 실행 엔진 (JdbcExecutor)
-- [ ] JdbcExecutor 클래스 구현
-- [ ] PreparedStatement 생성 및 실행
-- [ ] SQL 파라미터 바인딩
-- [ ] 실행 결과 반환 (int, ResultSet)
+- [x] JdbcExecutor 클래스 구현
+- [x] PreparedStatement 생성 및 실행
+- [x] SQL 파라미터 바인딩
+- [x] 실행 결과 반환 (int, ResultSet)
 
 **주요 컴포넌트**:
 - `JdbcExecutor`: SQL 실행 엔진
