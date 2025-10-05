@@ -3,9 +3,10 @@ package io.simplejpa.engine.jdbc;
 import io.simplejpa.exception.JdbcException;
 import lombok.extern.slf4j.Slf4j;
 
-import java.sql.*;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
