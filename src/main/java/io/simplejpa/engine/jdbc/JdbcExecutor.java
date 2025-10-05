@@ -34,9 +34,10 @@ public class JdbcExecutor {
         }
     }
 
-    public ResultSet executeQuery(
+    public <T> T executeQuery(
             Connection connection,
             String sql,
+            ResultSetExtractor<T> resultSetExtractor,
             Object... params
     ) {
         PreparedStatement pstmt = null;
@@ -45,10 +46,12 @@ public class JdbcExecutor {
             pstmt = connection.prepareStatement(sql);
             parameterBinder.bind(pstmt, params);
             resultSet = pstmt.executeQuery();
-            // TODO resource close 필요
-            return resultSet;
+            return resultSetExtractor.extractData(resultSet);
         } catch (SQLException e) {
             throw new JdbcException("Failed to execute query: " + sql, e);
+        } finally {
+            closePrepareStatement(pstmt);
+            closeResultSet(resultSet);
         }
     }
 
@@ -56,6 +59,7 @@ public class JdbcExecutor {
             Connection connection,
             String sql,
             Class<T> classType,
+            ResultSetExtractor<T> resultSetExtractor,
             Object... params
     ) {
         PreparedStatement pstmt = null;
@@ -65,7 +69,7 @@ public class JdbcExecutor {
             parameterBinder.bind(pstmt, params);
             resultSet = pstmt.executeQuery();
             if (resultSet.next()) {
-                return extractValue(classType, resultSet, 1);
+                return resultSetExtractor.extractData(resultSet);
             } else {
                 return null;
             }
@@ -80,7 +84,7 @@ public class JdbcExecutor {
     public <T> List<T> executeQueryForList(
             Connection connection,
             String sql,
-            Class<T> classType,
+            ResultSetExtractor<T> resultSetExtractor,
             Object... params
     ) {
         PreparedStatement pstmt = null;
@@ -91,7 +95,7 @@ public class JdbcExecutor {
             resultSet = pstmt.executeQuery();
             List<T> valueList = new ArrayList<>();
             while (resultSet.next()) {
-                T value = extractValue(classType, resultSet, 1);
+                T value = resultSetExtractor.extractData(resultSet);
                 if (value != null) {
                     valueList.add(value);
                 }
@@ -102,34 +106,6 @@ public class JdbcExecutor {
         } finally {
             closePrepareStatement(pstmt);
             closeResultSet(resultSet);
-        }
-    }
-
-    private <T> T extractValue(
-            Class<T> classType,
-            ResultSet resultSet,
-            int columnIndex
-    ) throws SQLException {
-        if (classType.equals(String.class)) {
-            return classType.cast(resultSet.getString(columnIndex));
-        } else if (classType.equals(Integer.class)) {
-            return classType.cast(resultSet.getInt(columnIndex));
-        } else if (classType.equals(Long.class)) {
-            return classType.cast(resultSet.getLong(columnIndex));
-        } else if (classType.equals(Double.class)) {
-            return classType.cast(resultSet.getDouble(columnIndex));
-        } else if (classType.equals(Boolean.class)) {
-            return classType.cast(resultSet.getBoolean(columnIndex));
-        } else if (classType.equals(java.util.Date.class)) {
-            return classType.cast(resultSet.getTimestamp(columnIndex));
-        } else if (classType.equals(LocalDateTime.class)) {
-            Timestamp ts = resultSet.getTimestamp(columnIndex);
-            return ts != null ? classType.cast(ts.toLocalDateTime()) : null;
-        } else if (classType.equals(LocalDate.class)) {
-            Date date = resultSet.getDate(columnIndex);
-            return date != null ? classType.cast(date.toLocalDate()) : null;
-        } else {
-            throw new JdbcException("Unsupported parameter type: " + classType);
         }
     }
 

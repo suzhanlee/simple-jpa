@@ -59,10 +59,10 @@
 - SQL 예외 처리
 
 ### Step 2.4: ResultSet 처리
-- [ ] ResultSetExtractor 인터페이스
-- [ ] 기본 타입 매핑 (Long, String, Integer, etc.)
-- [ ] ResultSet → 객체 변환 로직
-- [ ] 컬럼명 → 필드 매핑 (메타데이터 활용)
+- [x] ResultSetExtractor 인터페이스
+- [x] 기본 타입 매핑 (Long, String, Integer, etc.)
+- [x] ResultSet → 객체 변환 로직
+- [x] 컬럼명 → 필드 매핑 (메타데이터 활용)
 
 **주요 컴포넌트**:
 - `ResultSetExtractor`: ResultSet 추출 인터페이스
