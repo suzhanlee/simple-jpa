@@ -188,9 +188,9 @@ String name = proxy.getName();  // 이 시점에 DB에서 로드
 
 ### Phase 2: 기반 인프라
 - [x] JDBC Connection 관리
-- [ ] Transaction 기본 구조
-- [ ] SQL 실행 엔진 (JdbcExecutor)
-- [ ] ResultSet 처리
+- [x] Transaction 기본 구조
+- [x] SQL 실행 엔진 (JdbcExecutor)
+- [x] ResultSet 처리
 
 ### Phase 3: SQL 생성 엔진
 - [ ] INSERT SQL 생성 (메타데이터 활용)
