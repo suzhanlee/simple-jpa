@@ -162,33 +162,32 @@ String name = proxy.getName();  // 이 시점에 DB에서 로드
 ## 구현 단계
 
 ### Phase 1: 메타데이터 & 매핑 (최우선 - 모든 것의 기반)
-**왜 먼저?** 메타데이터 없이는 아무것도 할 수 없음. DB 연결 없이도 구현/테스트 가능.
 
 #### Step 1.1: 애노테이션 정의
-- [ ] @Entity - 엔티티 클래스 표시
-- [ ] @Table - 테이블 이름 매핑
-- [ ] @Id - Primary Key 표시
-- [ ] @Column - 컬럼 매핑
+- [x] @Entity - 엔티티 클래스 표시
+- [x] @Table - 테이블 이름 매핑
+- [x] @Id - Primary Key 표시
+- [x] @Column - 컬럼 매핑
 
 #### Step 1.2: EntityMetadata 구조 설계
-- [ ] EntityMetadata 클래스
-- [ ] AttributeMetadata 클래스
-- [ ] IdentifierMetadata 클래스
-- [ ] 테이블-컬럼 매핑 정보 저장
+- [x] EntityMetadata 클래스
+- [x] AttributeMetadata 클래스
+- [x] IdentifierMetadata 클래스
+- [x] 테이블-컬럼 매핑 정보 저장
 
 #### Step 1.3: 리플렉션 기반 메타데이터 추출
-- [ ] AnnotationProcessor 구현
-- [ ] 클래스 스캔 및 애노테이션 읽기
-- [ ] 필드 정보 추출
-- [ ] 메타데이터 객체 생성
+- [x] AnnotationProcessor 구현
+- [x] 클래스 스캔 및 애노테이션 읽기
+- [x] 필드 정보 추출
+- [x] 메타데이터 객체 생성
 
 #### Step 1.4: MetadataRegistry (메타데이터 저장소)
-- [ ] 메타데이터 캐싱
-- [ ] 클래스 → 메타데이터 조회
-- [ ] 테스트 엔티티로 검증
+- [x] 메타데이터 캐싱
+- [x] 클래스 → 메타데이터 조회
+- [x] 테스트 엔티티로 검증
 
 ### Phase 2: 기반 인프라
-- [ ] JDBC Connection 관리
+- [x] JDBC Connection 관리
 - [ ] Transaction 기본 구조
 - [ ] SQL 실행 엔진 (JdbcExecutor)
 - [ ] ResultSet 처리

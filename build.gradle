@@ -15,21 +15,25 @@ repositories {
 }
 
 dependencies {
-    // Lombok
+    // lombok
     compileOnly 'org.projectlombok:lombok:1.18.30'
     annotationProcessor 'org.projectlombok:lombok:1.18.30'
 
-    // 테스트에서도 Lombok 사용
+    // test lombok
     testCompileOnly 'org.projectlombok:lombok:1.18.30'
     testAnnotationProcessor 'org.projectlombok:lombok:1.18.30'
 
-    // 테스트 의존성
+    // test
     testImplementation 'org.junit.jupiter:junit-jupiter:5.10.0'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     testImplementation 'org.assertj:assertj-core:3.24.2'
 
-    // H2 Database (테스트용)
+    // H2
     testImplementation 'com.h2database:h2:2.2.224'
+
+    // logging
+    implementation 'org.slf4j:slf4j-api:2.0.9'
+    testImplementation 'org.slf4j:slf4j-simple:2.0.9'
 }
 
 test {

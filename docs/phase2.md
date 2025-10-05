@@ -6,10 +6,10 @@
 ## 구현 단계
 
 ### Step 2.1: JDBC Connection 관리
-- [ ] ConnectionProvider 인터페이스 정의
-- [ ] DriverManagerConnectionProvider 구현
-- [ ] Connection Pool 기본 구조 (선택사항)
-- [ ] Connection 생성 및 해제 로직
+- [x] ConnectionProvider 인터페이스 정의
+- [x] DriverManagerConnectionProvider 구현
+- [x] Connection Pool 기본 구조 (선택사항)
+- [x] Connection 생성 및 해제 로직
 
 **주요 컴포넌트**:
 - `ConnectionProvider`: Connection 제공 인터페이스
