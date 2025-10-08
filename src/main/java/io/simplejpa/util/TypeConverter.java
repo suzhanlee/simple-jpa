@@ -20,7 +20,7 @@ public class TypeConverter {
         return convertType(value, targetType);
     }
 
-    private Object convertType(Object value, Class<?> targetType) {
+    public Object convertType(Object value, Class<?> targetType) {
         if (targetType.isInstance(value)) {
             return value;
         }
