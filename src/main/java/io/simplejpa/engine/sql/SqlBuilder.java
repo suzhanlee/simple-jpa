@@ -1,15 +1,16 @@
 package io.simplejpa.engine.sql;
 
-import lombok.NoArgsConstructor;
-
 import java.util.Collections;
 import java.util.List;
 
 public class SqlBuilder {
     private final StringBuilder sql;
+    private final SqlIndenter sqlIndenter;
 
-    public SqlBuilder(StringBuilder sql) {
-        this.sql = sql;
+    // TODO 이후 Spring Bean으로 등록 필요
+    public SqlBuilder() {
+        this.sql = new StringBuilder();
+        this.sqlIndenter = new SqlIndenter();
     }
 
     public SqlBuilder appendTable(String tableName) {
@@ -18,9 +19,7 @@ public class SqlBuilder {
     }
 
     public SqlBuilder append(String text) {
-        if (!sql.isEmpty() && !sql.toString().endsWith(" ")) {
-            sql.append(" ");
-        }
+        sqlIndenter.sqlIndentIfNeeded(this.sql);
         sql.append(text);
         return this;
     }

@@ -27,7 +27,7 @@ public class InsertSqlGenerator {
     }
 
     private String createInsertSql(EntityMetadata entityMetadata, List<String> columnNames, List<Object> parameters) {
-        SqlBuilder sqlBuilder = new SqlBuilder(new StringBuilder());
+        SqlBuilder sqlBuilder = new SqlBuilder();
         return sqlBuilder.append("INSERT INTO ")
                 .appendTable(entityMetadata.getTableName())
                 .append("(")

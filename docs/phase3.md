@@ -30,10 +30,10 @@
 ```
 
 ### Step 3.2: SELECT SQL 생성
-- [ ] SelectSqlGenerator 클래스 구현
-- [ ] Primary Key 기반 단일 조회 (findById)
-- [ ] 전체 컬럼 SELECT 문 생성
-- [ ] WHERE 절 생성 (ID 기반)
+- [x] SelectSqlGenerator 클래스 구현
+- [x] Primary Key 기반 단일 조회 (findById)
+- [x] 전체 컬럼 SELECT 문 생성
+- [x] WHERE 절 생성 (ID 기반)
 
 **주요 컴포넌트**:
 - `SelectSqlGenerator`: SELECT SQL 생성기
