@@ -15,7 +15,7 @@ public class ParameterCollector {
     }
 
     public List<Object> collectInsertParameters(
-            EntityMetadata  entityMetadata,
+            EntityMetadata entityMetadata,
             Object entity
     ) {
         List<Object> parameters = new ArrayList<>();
@@ -24,6 +24,28 @@ public class ParameterCollector {
             Object convertedValue = typeConverter.convertType(value, attr.getJavaType());
             parameters.add(convertedValue);
         }
+        return parameters;
+    }
+
+    public List<Object> collectUpdateParameters(
+            EntityMetadata metadata,
+            Object entity
+    ) {
+        String idColumnName = metadata.getIdentifierMetadata().getColumnName();
+        List<Object> parameters = new ArrayList<>();
+
+        for (AttributeMetadata attr : metadata.getAttributeMetadatas()) {
+            if (attr.getColumnName().equals(idColumnName)) {
+                continue;
+            }
+
+            Object value = attr.getValue(entity);
+            Object convertedValue = typeConverter.convertType(value, attr.getJavaType());
+            parameters.add(convertedValue);
+        }
+
+        parameters.add(metadata.getIdentifierMetadata().getValue(entity));
+
         return parameters;
     }
 }

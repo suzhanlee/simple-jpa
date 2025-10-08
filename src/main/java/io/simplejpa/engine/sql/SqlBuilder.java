@@ -14,6 +14,7 @@ public class SqlBuilder {
     }
 
     public SqlBuilder appendTable(String tableName) {
+        sqlIndenter.sqlIndentIfNeeded(this.sql);
         this.sql.append(tableName);
         return this;
     }
@@ -25,15 +26,33 @@ public class SqlBuilder {
     }
 
     public SqlBuilder appendColumns(List<String> columnNames) {
+        sqlIndenter.sqlIndentIfNeeded(this.sql);
         String joined = String.join(", ", columnNames);
         sql.append(joined);
         return this;
     }
 
     public SqlBuilder appendPlaceholders(int count) {
+        sqlIndenter.sqlIndentIfNeeded(this.sql);
         List<String> placeholders = Collections.nCopies(count, "?");
         sql.append(String.join(", ", placeholders));
         return this;
+    }
+
+    public SqlBuilder appendSetClause(List<String> columnNames) {
+        sqlIndenter.sqlIndentIfNeeded(this.sql);
+
+        List<String> setClauses = columnNames.stream()
+                .map(col -> col + " = ?")
+                .toList();
+
+        sql.append(String.join(", ", setClauses));
+
+        return this;
+    }
+
+    public SqlBuilder appendSingleSetClause(String columnName) {
+        return appendSetClause(Collections.singletonList(columnName));
     }
 
     public String build() {
