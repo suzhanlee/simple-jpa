@@ -92,9 +92,9 @@
 
 ### Step 3.4: DELETE SQL 생성
 
-- [ ] DeleteSqlGenerator 클래스 구현
-- [ ] WHERE 절 생성 (Primary Key 기반)
-- [ ] 단순 삭제 구조
+- [x] DeleteSqlGenerator 클래스 구현
+- [x] WHERE 절 생성 (Primary Key 기반)
+- [x] 단순 삭제 구조
 
 **주요 컴포넌트**:
 
