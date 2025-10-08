@@ -116,10 +116,10 @@
 
 ### Step 3.5: WHERE 절 생성 (공통)
 
-- [ ] WhereClauseBuilder 클래스 구현
-- [ ] Primary Key 기반 조건
-- [ ] 복합 조건 지원 (AND, OR) - 기본 구조만
-- [ ] 파라미터 바인딩 위치 관리
+- [x] WhereClauseBuilder 클래스 구현
+- [x] Primary Key 기반 조건
+- [x] 복합 조건 지원 (AND, OR) - 기본 구조만
+- [x] 파라미터 바인딩 위치 관리
 
 **주요 컴포넌트**:
 

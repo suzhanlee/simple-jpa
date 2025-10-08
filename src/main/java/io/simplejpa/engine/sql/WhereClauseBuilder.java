@@ -34,7 +34,7 @@ public class WhereClauseBuilder {
         sqlIndenter.sqlIndentIfNeeded(this.sql);
         sql.append("WHERE ")
                 .append(columnName)
-                .append( "= ?");
+                .append("= ?");
         return this;
     }
 
@@ -43,6 +43,24 @@ public class WhereClauseBuilder {
         sql.append("AND ")
                 .append(columnName)
                 .append(" = ?");
+        return this;
+    }
+
+    public WhereClauseBuilder or(Condition condition) {
+        sqlIndenter.sqlIndentIfNeeded(this.sql);
+        sql.append("OR ").append(condition.toSql());
+        return this;
+    }
+
+    public WhereClauseBuilder where(Condition condition) {
+        sqlIndenter.sqlIndentIfNeeded(this.sql);
+        sql.append("WHERE ").append(condition.toSql());
+        return this;
+    }
+
+    public WhereClauseBuilder and(Condition condition) {
+        sqlIndenter.sqlIndentIfNeeded(this.sql);
+        sql.append("AND ").append(condition.toSql());
         return this;
     }
 

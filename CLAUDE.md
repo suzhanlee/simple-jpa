@@ -193,11 +193,11 @@ String name = proxy.getName();  // 이 시점에 DB에서 로드
 - [x] ResultSet 처리
 
 ### Phase 3: SQL 생성 엔진
-- [ ] INSERT SQL 생성 (메타데이터 활용)
-- [ ] SELECT SQL 생성
-- [ ] UPDATE SQL 생성
-- [ ] DELETE SQL 생성
-- [ ] WHERE 절 생성
+- [x] INSERT SQL 생성 (메타데이터 활용)
+- [x] SELECT SQL 생성
+- [x] UPDATE SQL 생성
+- [x] DELETE SQL 생성
+- [x] WHERE 절 생성
 
 ### Phase 4: 핵심 API (최소 구현)
 - [ ] EntityManagerFactory 기본 구조
