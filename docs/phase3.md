@@ -6,10 +6,10 @@
 ## 구현 단계
 
 ### Step 3.1: INSERT SQL 생성 (메타데이터 활용)
-- [ ] InsertSqlGenerator 클래스 구현
-- [ ] EntityMetadata를 활용한 INSERT 문 생성
-- [ ] 컬럼명 및 VALUES 절 자동 생성
-- [ ] Primary Key 처리 (자동 생성 vs 수동 할당)
+- [x] InsertSqlGenerator 클래스 구현
+- [x] EntityMetadata를 활용한 INSERT 문 생성
+- [x] 컬럼명 및 VALUES 절 자동 생성
+- [x] Primary Key 처리 (자동 생성 vs 수동 할당)
 
 **주요 컴포넌트**:
 - `InsertSqlGenerator`: INSERT SQL 생성기
