@@ -82,11 +82,11 @@ try {
 
 ### Step 4.3: EntityManager 기본 구조
 
-- [ ] EntityManager 인터페이스 및 구현체
-- [ ] 생명주기 관리 (open/close)
-- [ ] Transaction 관리 위임
-- [ ] Connection 관리 위임
-- [ ] CRUD 메서드 시그니처 정의 (구현은 Phase 6)
+- [x] EntityManager 인터페이스 및 구현체
+- [x] 생명주기 관리 (open/close)
+- [x] Transaction 관리 위임
+- [x] Connection 관리 위임
+- [x] CRUD 메서드 시그니처 정의 (구현은 Phase 6)
 
 **주요 컴포넌트**:
 - `EntityManager`: 인터페이스
@@ -131,10 +131,10 @@ try {
 
 ### Step 4.4: Persistence (유틸리티 클래스)
 
-- [ ] Persistence 유틸리티 클래스
-- [ ] createEntityManagerFactory() 메서드
-- [ ] Configuration 빌더 패턴
-- [ ] 편의 메서드 제공
+- [x] Persistence 유틸리티 클래스
+- [x] createEntityManagerFactory() 메서드
+- [x] Configuration 빌더 패턴
+- [x] 편의 메서드 제공
 
 **주요 컴포넌트**:
 - `Persistence`: 정적 유틸리티 클래스
@@ -393,32 +393,32 @@ emf.close();
 ## Phase 4 핵심 체크리스트
 
 ### EntityManagerFactory
-- [ ] 싱글톤 패턴 구현
-- [ ] Thread-safe 보장
-- [ ] MetadataRegistry 초기화
-- [ ] ConnectionProvider 초기화
-- [ ] EntityManager 생성 메서드
-- [ ] 리소스 정리 (close)
+- [x] 싱글톤 패턴 구현
+- [x] Thread-safe 보장
+- [x] MetadataRegistry 초기화
+- [x] ConnectionProvider 초기화
+- [x] EntityManager 생성 메서드
+- [x] 리소스 정리 (close)
 
 ### EntityTransaction
-- [ ] begin() 구현
-- [ ] commit() 구현
-- [ ] rollback() 구현
-- [ ] isActive() 구현
-- [ ] Connection 생명주기 관리
-- [ ] JdbcTransaction 연계
+- [x] begin() 구현
+- [x] commit() 구현
+- [x] rollback() 구현
+- [x] isActive() 구현
+- [x] Connection 생명주기 관리
+- [x] JdbcTransaction 연계
 
 ### EntityManager
-- [ ] 생명주기 관리 (open/close)
-- [ ] Transaction 획득 메서드
-- [ ] CRUD 메서드 시그니처 정의
-- [ ] Connection 관리
-- [ ] 상태 검증 (closed 체크)
+- [x] 생명주기 관리 (open/close)
+- [x] Transaction 획득 메서드
+- [x] CRUD 메서드 시그니처 정의
+- [x] Connection 관리
+- [x] 상태 검증 (closed 체크)
 
 ### Persistence
-- [ ] createEntityManagerFactory() 구현
-- [ ] Configuration 빌더 제공
-- [ ] 편의 메서드 제공
+- [x] createEntityManagerFactory() 구현
+- [x] Configuration 빌더 제공
+- [x] 편의 메서드 제공
 
 ---
 

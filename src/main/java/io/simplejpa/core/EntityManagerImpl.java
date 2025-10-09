@@ -35,4 +35,31 @@ public class EntityManagerImpl implements EntityManager {
     public boolean isOpen() {
         return this.open;
     }
+
+    @Override
+    public void persist(Object entity) {
+        // TODO
+    }
+
+    @Override
+    public <T> T find(Class<T> entityClass, Object primaryKey) {
+        // TODO
+        return null;
+    }
+
+    @Override
+    public <T> T merge(T entity) {
+        // TODO
+        return null;
+    }
+
+    @Override
+    public void remove(Object entity) {
+        // TODO
+    }
+
+    @Override
+    public void flush() {
+        // TODO
+    }
 }
