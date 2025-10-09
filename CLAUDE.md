@@ -200,9 +200,13 @@ String name = proxy.getName();  // 이 시점에 DB에서 로드
 - [x] WHERE 절 생성
 
 ### Phase 4: 핵심 API (최소 구현)
-- [ ] EntityManagerFactory 기본 구조
-- [ ] EntityManager 기본 구조
-- [ ] EntityTransaction 기본 구조
+- [x] EntityManagerFactory 기본 구조
+- [x] EntityManager 기본 구조 (CRUD 시그니처만)
+- [x] EntityTransaction 기본 구조
+
+**Phase 4 설계 결정사항**:
+- **트랜잭션 정책**: 현재는 모든 DB 작업(조회 포함)에 트랜잭션 필수
+- **향후 개선 계획**: Phase 6에서 조회 작업의 트랜잭션 선택적 지원 추가 가능
 
 ### Phase 5: 영속성 컨텍스트
 - [ ] PersistenceContext 구현
@@ -212,11 +216,16 @@ String name = proxy.getName();  // 이 시점에 DB에서 로드
 
 ### Phase 6: CRUD 연산 (Persister)
 - [ ] persist() - INSERT 실행
-- [ ] find() - SELECT by ID 실행
+- [ ] find() - SELECT by ID 실행 (트랜잭션 선택적 지원 고려)
 - [ ] merge() - UPDATE 실행
 - [ ] remove() - DELETE 실행
 - [ ] flush() - ActionQueue 실행
 - [ ] Dirty Checking
+
+**Phase 6 개선 TODO**:
+- [ ] find() 메서드에서 트랜잭션 없이도 조회 가능하도록 개선 (선택사항)
+  - 활성 트랜잭션 있으면 해당 Connection 사용
+  - 없으면 임시 Connection 생성 (auto-commit 모드)
 
 ### Phase 7: 쿼리 처리 (기본)
 - [ ] JPQL 파서 (간단한 SELECT만)

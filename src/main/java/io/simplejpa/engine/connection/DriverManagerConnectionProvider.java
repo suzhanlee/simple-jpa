@@ -49,4 +49,9 @@ public class DriverManagerConnectionProvider implements ConnectionProvider {
     public boolean supportsAggressiveRelease() {
         return false; // pool 폴링 없음
     }
+
+    @Override
+    public void shutDown() {
+        // connection pool 이 아직 없으므로 필요 x
+    }
 }

@@ -1,5 +1,6 @@
 package io.simplejpa.transaction;
 
+import io.simplejpa.core.EntityTransaction;
 import io.simplejpa.engine.connection.ConnectionProvider;
 import io.simplejpa.exception.JdbcException;
 import lombok.extern.slf4j.Slf4j;
@@ -8,14 +9,12 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 @Slf4j
-public class JdbcTransaction implements TransactionCoordinator {
+public class JdbcTransaction implements TransactionCoordinator, EntityTransaction {
     private final ConnectionProvider connectionProvider;
     private Connection connection;
     private TransactionStatus status;
 
-    public JdbcTransaction(
-            ConnectionProvider connectionProvider
-    ) {
+    public JdbcTransaction(ConnectionProvider connectionProvider) {
         this.connectionProvider = connectionProvider;
         this.status = TransactionStatus.NOT_ACTIVE;
     }
