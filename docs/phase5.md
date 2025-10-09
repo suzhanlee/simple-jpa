@@ -37,10 +37,10 @@ MANAGED ←→ DETACHED      - 준영속 상태 (detach(), clear(), close())
 
 ### Step 5.1: EntityKey (엔티티 식별자)
 
-- [ ] EntityKey 클래스 구현
-- [ ] 엔티티 클래스 + ID로 고유 식별
-- [ ] equals(), hashCode() 구현
-- [ ] 1차 캐시의 Map 키로 사용
+- [x] EntityKey 클래스 구현
+- [x] 엔티티 클래스 + ID로 고유 식별
+- [x] equals(), hashCode() 구현
+- [x] 1차 캐시의 Map 키로 사용
 
 **주요 컴포넌트**:
 - `EntityKey`: 엔티티 타입 + ID를 조합한 고유 키
