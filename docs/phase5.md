@@ -91,9 +91,9 @@ public class EntityKey {
 
 ### Step 5.2: EntityStatus (엔티티 상태)
 
-- [ ] EntityStatus Enum 정의
-- [ ] 엔티티 생명주기 상태 표현
-- [ ] 상태 전이 규칙 정의
+- [x] EntityStatus Enum 정의
+- [x] 엔티티 생명주기 상태 표현
+- [x] 상태 전이 규칙 정의
 
 **주요 컴포넌트**:
 - `EntityStatus`: 엔티티의 생명주기 상태
