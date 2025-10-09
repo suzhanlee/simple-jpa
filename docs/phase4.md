@@ -45,11 +45,11 @@ emf.close();
 
 ### Step 4.2: EntityTransaction 구현
 
-- [ ] EntityTransaction 인터페이스 및 구현체
-- [ ] Transaction 시작/커밋/롤백
-- [ ] JdbcTransaction 연계 (Phase 2)
-- [ ] Transaction 상태 관리
-- [ ] Connection 생명주기 관리
+- [x] EntityTransaction 인터페이스 및 구현체
+- [x] Transaction 시작/커밋/롤백
+- [x] JdbcTransaction 연계 (Phase 2)
+- [x] Transaction 상태 관리
+- [x] Connection 생명주기 관리
 
 **주요 컴포넌트**:
 - `EntityTransaction`: 트랜잭션 인터페이스
