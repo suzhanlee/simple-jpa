@@ -7,4 +7,5 @@ public interface ConnectionProvider {
     Connection getConnection() throws SQLException;
     void closeConnection(Connection connection) throws SQLException;
     boolean supportsAggressiveRelease();
+    void shutDown();
 }

@@ -10,11 +10,11 @@
 
 ### Step 4.1: EntityManagerFactory 구현
 
-- [ ] EntityManagerFactory 인터페이스 및 구현체
-- [ ] Configuration 로딩 (persistence.xml 없이 코드 기반)
-- [ ] MetadataRegistry 초기화
-- [ ] ConnectionProvider 설정
-- [ ] EntityManager 생성 팩토리 메서드
+- [x] EntityManagerFactory 인터페이스 및 구현체
+- [x] Configuration 로딩 (persistence.xml 없이 코드 기반)
+- [x] MetadataRegistry 초기화
+- [x] ConnectionProvider 설정
+- [x] EntityManager 생성 팩토리 메서드
 
 **주요 컴포넌트**:
 - `EntityManagerFactory`: 팩토리 인터페이스
