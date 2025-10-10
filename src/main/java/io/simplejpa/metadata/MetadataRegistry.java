@@ -25,9 +25,7 @@ public class MetadataRegistry {
     public EntityMetadata getMetadata(Class<?> entityClass) {
         EntityMetadata metadata = metadataCache.get(entityClass);
         if (metadata == null) {
-            throw new IllegalArgumentException(
-                    "No metadata found for " + entityClass.getName()
-            );
+            throw new IllegalArgumentException("No metadata found for " + entityClass.getName());
         }
         return metadata;
     }

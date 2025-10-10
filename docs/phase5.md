@@ -165,10 +165,10 @@ public class EntityEntry {
 
 ### Step 5.4: ActionQueue (쓰기 지연)
 
-- [ ] ActionQueue 클래스 구현
-- [ ] INSERT/UPDATE/DELETE 액션 대기열
-- [ ] 실행 순서 보장 (INSERT → UPDATE → DELETE)
-- [ ] execute() 메서드로 일괄 실행
+- [x] ActionQueue 클래스 구현
+- [x] INSERT/UPDATE/DELETE 액션 대기열
+- [x] 실행 순서 보장 (INSERT → UPDATE → DELETE)
+- [x] execute() 메서드로 일괄 실행
 
 **주요 컴포넌트**:
 - `ActionQueue`: 쓰기 작업 대기열
