@@ -239,11 +239,11 @@ public class InsertAction implements EntityAction {
 
 ### Step 5.5: PersistenceContext (영속성 컨텍스트)
 
-- [ ] PersistenceContext 클래스 구현
-- [ ] IdentityMap (1차 캐시) 관리
-- [ ] EntityEntry 맵 관리
-- [ ] ActionQueue 관리
-- [ ] 엔티티 추가/조회/삭제 메서드
+- [x] PersistenceContext 클래스 구현
+- [x] IdentityMap (1차 캐시) 관리
+- [x] EntityEntry 맵 관리
+- [x] ActionQueue 관리
+- [x] 엔티티 추가/조회/삭제 메서드
 
 **주요 컴포넌트**:
 - `PersistenceContext`: 영속성 컨텍스트 핵심 구현체
