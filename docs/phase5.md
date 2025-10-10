@@ -116,10 +116,10 @@ public enum EntityStatus {
 
 ### Step 5.3: EntityEntry (엔티티 상태 추적)
 
-- [ ] EntityEntry 클래스 구현
-- [ ] 엔티티별 상태 정보 저장
-- [ ] 로드 시점의 스냅샷 저장 (Dirty Checking용)
-- [ ] 상태 변경 메서드
+- [x] EntityEntry 클래스 구현
+- [x] 엔티티별 상태 정보 저장
+- [x] 로드 시점의 스냅샷 저장 (Dirty Checking용)
+- [x] 상태 변경 메서드
 
 **주요 컴포넌트**:
 - `EntityEntry`: 엔티티의 상태 정보와 스냅샷
