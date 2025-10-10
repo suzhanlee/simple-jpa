@@ -14,7 +14,9 @@
       "Bash(setx:*)",
       "Bash(export:*)",
       "Bash(export PATH=\"$JAVA_HOME/bin:$PATH\")",
-      "Bash(java -version)"
+      "Bash(java -version)",
+      "WebSearch",
+      "WebFetch(domain:github.com)"
     ],
     "deny": [],
     "ask": []

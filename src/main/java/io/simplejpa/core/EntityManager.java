@@ -16,4 +16,6 @@ public interface EntityManager {
     void remove(Object entity);
 
     void flush();
+
+    boolean contains(Object entity);
 }

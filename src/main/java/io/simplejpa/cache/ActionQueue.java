@@ -1,0 +1,90 @@
+package io.simplejpa.cache;
+
+import io.simplejpa.cache.action.DeleteAction;
+import io.simplejpa.cache.action.EntityAction;
+import io.simplejpa.cache.action.InsertAction;
+import io.simplejpa.cache.action.UpdateAction;
+import io.simplejpa.engine.jdbc.JdbcExecutor;
+import io.simplejpa.engine.sql.DeleteSqlGenerator;
+import io.simplejpa.engine.sql.InsertSqlGenerator;
+import io.simplejpa.engine.sql.UpdateSqlGenerator;
+import io.simplejpa.metadata.MetadataRegistry;
+import lombok.extern.slf4j.Slf4j;
+
+import java.sql.Connection;
+import java.util.ArrayList;
+import java.util.List;
+
+@Slf4j
+public class ActionQueue {
+    private final List<EntityAction> insertions = new ArrayList<>();
+    private final List<EntityAction> updates = new ArrayList<>();
+    private final List<EntityAction> deletions = new ArrayList<>();
+
+    private final MetadataRegistry metadataRegistry;
+    private final InsertSqlGenerator insertSqlGenerator;
+    private final UpdateSqlGenerator updateSqlGenerator;
+    private final DeleteSqlGenerator deleteSqlGenerator;
+    private final JdbcExecutor jdbcExecutor;
+
+    public ActionQueue(
+            MetadataRegistry metadataRegistry,
+            InsertSqlGenerator insertSqlGenerator,
+            UpdateSqlGenerator updateSqlGenerator,
+            DeleteSqlGenerator deleteSqlGenerator,
+            JdbcExecutor jdbcExecutor
+    ) {
+        this.metadataRegistry = metadataRegistry;
+        this.insertSqlGenerator = insertSqlGenerator;
+        this.updateSqlGenerator = updateSqlGenerator;
+        this.deleteSqlGenerator = deleteSqlGenerator;
+        this.jdbcExecutor = jdbcExecutor;
+    }
+
+    public void addInsertion(Object entity) {
+        insertions.add(new InsertAction(
+                entity,
+                metadataRegistry.getMetadata(entity.getClass()),
+                insertSqlGenerator,
+                jdbcExecutor
+        ));
+    }
+
+    public void addUpdate(Object entity) {
+        updates.add(new UpdateAction(
+                entity,
+                updateSqlGenerator,
+                metadataRegistry.getMetadata(entity.getClass()),
+                jdbcExecutor
+        ));
+    }
+
+    public void addDeletion(Object entity) {
+        deletions.add(new DeleteAction(
+                entity,
+                deleteSqlGenerator,
+                metadataRegistry.getMetadata(entity.getClass()),
+                jdbcExecutor
+        ));
+    }
+
+    public void executeActions(Connection connection) {
+        executeList(insertions, connection);
+        executeList(updates, connection);
+        executeList(deletions, connection);
+        clear();
+    }
+
+    private void executeList(List<EntityAction> insertions, Connection connection) {
+        for (EntityAction insertion : insertions) {
+            insertion.execute(connection);
+        }
+    }
+
+    public void clear() {
+        insertions.clear();
+        updates.clear();
+        deletions.clear();
+    }
+
+}
