@@ -338,12 +338,12 @@ public class PersistenceContext {
 
 ### Step 5.6: EntityManager와 통합
 
-- [ ] EntityManagerImpl에 PersistenceContext 추가
-- [ ] persist() 메서드와 연결
-- [ ] find() 메서드와 1차 캐시 연결
-- [ ] remove() 메서드와 연결
-- [ ] flush() 메서드 구현
-- [ ] clear() 메서드 구현
+- [x] EntityManagerImpl에 PersistenceContext 추가
+- [x] persist() 메서드와 연결
+- [x] find() 메서드와 1차 캐시 연결
+- [x] remove() 메서드와 연결
+- [x] flush() 메서드 구현
+- [x] clear() 메서드 구현
 
 **주요 변경사항**:
 - EntityManagerImpl이 PersistenceContext를 보유

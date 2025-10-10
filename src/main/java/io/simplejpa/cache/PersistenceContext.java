@@ -22,12 +22,15 @@ public class PersistenceContext {
     }
 
     public void addEntity(Object entity) {
+        addFirstCacheAndSnapShot(entity);
+        actionQueue.addInsertion(entity);
+    }
+
+    private void addFirstCacheAndSnapShot(Object entity) {
         Class<?> entityClass = entity.getClass();
         EntityMetadata metadata = metadataRegistry.getMetadata(entityClass);
-
         Object idValue = metadata.getIdentifierMetadata().getValue(entity);
         firstLevelCache.put(new EntityKey(entityClass, idValue), entity);
-
         entityEntries.put(entity, createEntityEntry(entity, metadata));
     }
 
