@@ -209,10 +209,10 @@ String name = proxy.getName();  // 이 시점에 DB에서 로드
 - **향후 개선 계획**: Phase 6에서 조회 작업의 트랜잭션 선택적 지원 추가 가능
 
 ### Phase 5: 영속성 컨텍스트
-- [ ] PersistenceContext 구현
-- [ ] 1차 캐시 (IdentityMap)
-- [ ] Entity 상태 관리 (EntityEntry)
-- [ ] ActionQueue (쓰기 지연)
+- [x] PersistenceContext 구현
+- [x] 1차 캐시 (IdentityMap)
+- [x] Entity 상태 관리 (EntityEntry)
+- [x] ActionQueue (쓰기 지연)
 
 ### Phase 6: CRUD 연산 (Persister)
 - [ ] persist() - INSERT 실행
