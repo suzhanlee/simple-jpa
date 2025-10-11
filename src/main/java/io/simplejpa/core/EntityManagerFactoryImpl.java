@@ -13,7 +13,6 @@ import io.simplejpa.persister.EntityDeleter;
 import io.simplejpa.persister.EntityLoader;
 import io.simplejpa.persister.EntityPersister;
 import io.simplejpa.persister.EntityUpdater;
-import io.simplejpa.transaction.JdbcTransaction;
 import io.simplejpa.util.TypeConverter;
 import lombok.extern.slf4j.Slf4j;
 
@@ -95,13 +94,15 @@ public class EntityManagerFactoryImpl implements EntityManagerFactory {
             throw new IllegalStateException("EntityManagerFactory is closed");
         }
         EntityManager entityManager = new EntityManagerImpl(
+                metadataRegistry,
                 persistenceContext,
                 connectionProvider,
                 new EntityLoader(
                         metadataRegistry,
                         new SelectSqlGenerator(),
                         new JdbcExecutor(new ParameterBinder())
-                )
+                ),
+                new ParameterBinder()
         );
         activeEntityManagers.add(entityManager);
         return entityManager;

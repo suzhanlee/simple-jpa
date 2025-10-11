@@ -30,6 +30,13 @@ public class MetadataRegistry {
         return metadata;
     }
 
+    public EntityMetadata getMetadataByEntityName(String entityName) {
+        return metadataCache.values().stream()
+                .filter(metadata -> metadata.getEntityName().equals(entityName))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("No metadata found for " + entityName));
+    }
+
     public void register(Class<?> entityClass, EntityMetadata entityMetadata) {
         metadataCache.put(entityClass, entityMetadata);
     }
