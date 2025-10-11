@@ -18,6 +18,11 @@ public class EntityManagerImpl implements EntityManager {
     ) {
         this.persistenceContext = persistenceContext;
         this.jdbcTransaction = new JdbcTransaction(connectionProvider);
+
+        // call back
+        this.jdbcTransaction.setFlushCallback(this::flush);
+        this.jdbcTransaction.setClearCallback(persistenceContext::clear);
+
         this.entityLoader = entityLoader;
         this.open = true;
     }

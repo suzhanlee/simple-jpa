@@ -596,10 +596,10 @@ public void executeActions(JdbcExecutor executor,
 
 ### Step 6.5: flush() 완전 구현
 
-- [ ] flush() 메서드 완성
-- [ ] Dirty Checking 자동 수행
-- [ ] ActionQueue 실행
-- [ ] 트랜잭션 커밋 시 자동 flush
+- [x] flush() 메서드 완성
+- [x] Dirty Checking 자동 수행
+- [x] ActionQueue 실행
+- [x] 트랜잭션 커밋 시 자동 flush
 
 **주요 변경사항**:
 

@@ -14,6 +14,9 @@ public class JdbcTransaction implements TransactionCoordinator, EntityTransactio
     private Connection connection;
     private TransactionStatus status;
 
+    private Runnable flushCallback;
+    private Runnable clearCallback;
+
     public JdbcTransaction(ConnectionProvider connectionProvider) {
         this.connectionProvider = connectionProvider;
         this.status = TransactionStatus.NOT_ACTIVE;
@@ -49,6 +52,11 @@ public class JdbcTransaction implements TransactionCoordinator, EntityTransactio
             throw new IllegalStateException("Transaction is not active");
         }
         try {
+            if (flushCallback != null) {
+                flushCallback.run();
+                log.debug("persistence context flush");
+            }
+
             connection.commit();
             this.status = TransactionStatus.COMMITTED;
             log.debug("transaction commit");
@@ -75,8 +83,14 @@ public class JdbcTransaction implements TransactionCoordinator, EntityTransactio
         }
         try {
             connection.rollback();
-            connection.setAutoCommit(log.isTraceEnabled());
+            connection.setAutoCommit(true);
             this.status = TransactionStatus.ROLLED_BACK;
+
+            if (clearCallback != null) {
+                clearCallback.run();
+                log.debug("persistence context clear");
+            }
+
             log.debug("transaction rollback");
         } catch (SQLException e) {
             log.error("Failed to rollback transaction", e);
@@ -108,5 +122,15 @@ public class JdbcTransaction implements TransactionCoordinator, EntityTransactio
     @Override
     public TransactionStatus getStatus() {
         return this.status;
+    }
+
+    @Override
+    public void setFlushCallback(Runnable callback) {
+        this.flushCallback = callback;
+    }
+
+    @Override
+    public void setClearCallback(Runnable callback) {
+        this.clearCallback = callback;
     }
 }

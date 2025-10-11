@@ -62,7 +62,23 @@ public class PersistenceContext {
     public void flush(Connection connection) {
         detectDirtyEntities();
         actionQueue.executeActions(connection);
-        // flush 하더라도 1차 캐시는 유지된다.
+        removeEntityFromFirstCacheAndEntries();
+    }
+
+    private void removeEntityFromFirstCacheAndEntries() {
+        for (Object removedEntity : findRemovedEntities()) {
+            EntityMetadata metadata = metadataRegistry.getMetadata(removedEntity.getClass());
+            Object idValue = metadata.getIdentifierMetadata().getValue(removedEntity);
+            firstLevelCache.remove(new EntityKey(removedEntity.getClass(), idValue));
+            entityEntries.remove(removedEntity);
+        }
+    }
+
+    private List<Object> findRemovedEntities() {
+        return entityEntries.entrySet().stream()
+                .filter(entry -> entry.getValue().isRemoved())
+                .map(Map.Entry::getKey)
+                .toList();
     }
 
     private void detectDirtyEntities() {

@@ -4,11 +4,6 @@ import io.simplejpa.cache.action.DeleteAction;
 import io.simplejpa.cache.action.EntityAction;
 import io.simplejpa.cache.action.InsertAction;
 import io.simplejpa.cache.action.UpdateAction;
-import io.simplejpa.engine.jdbc.JdbcExecutor;
-import io.simplejpa.engine.sql.DeleteSqlGenerator;
-import io.simplejpa.engine.sql.InsertSqlGenerator;
-import io.simplejpa.engine.sql.UpdateSqlGenerator;
-import io.simplejpa.metadata.MetadataRegistry;
 import io.simplejpa.persister.EntityDeleter;
 import io.simplejpa.persister.EntityPersister;
 import io.simplejpa.persister.EntityUpdater;
@@ -24,33 +19,18 @@ public class ActionQueue {
     private final List<EntityAction> updates = new ArrayList<>();
     private final List<EntityAction> deletions = new ArrayList<>();
 
-    private final MetadataRegistry metadataRegistry;
-    private final InsertSqlGenerator insertSqlGenerator;
-    private final UpdateSqlGenerator updateSqlGenerator;
-    private final DeleteSqlGenerator deleteSqlGenerator;
-    private final JdbcExecutor jdbcExecutor;
     private final EntityPersister entityPersister;
     private final EntityUpdater entityUpdater;
     private final EntityDeleter entityDeleter;
 
     public ActionQueue(
-            MetadataRegistry metadataRegistry,
-            InsertSqlGenerator insertSqlGenerator,
-            UpdateSqlGenerator updateSqlGenerator,
-            DeleteSqlGenerator deleteSqlGenerator,
-            JdbcExecutor jdbcExecutor,
             EntityPersister entityPersister,
             EntityUpdater entityUpdater,
             EntityDeleter entityDeleter
     ) {
-        this.metadataRegistry = metadataRegistry;
-        this.insertSqlGenerator = insertSqlGenerator;
-        this.updateSqlGenerator = updateSqlGenerator;
-        this.deleteSqlGenerator = deleteSqlGenerator;
-        this.jdbcExecutor = jdbcExecutor;
-        this.entityPersister = new EntityPersister(jdbcExecutor, insertSqlGenerator, metadataRegistry);
-        this.entityUpdater = new EntityUpdater(metadataRegistry, updateSqlGenerator, jdbcExecutor);
-        this.entityDeleter = new EntityDeleter(metadataRegistry, deleteSqlGenerator, jdbcExecutor);
+        this.entityPersister = entityPersister;
+        this.entityUpdater = entityUpdater;
+        this.entityDeleter = entityDeleter;
     }
 
     public void addInsertion(Object entity) {
@@ -72,9 +52,9 @@ public class ActionQueue {
         clear();
     }
 
-    private void executeList(List<EntityAction> insertions, Connection connection) {
-        for (EntityAction insertion : insertions) {
-            insertion.execute(connection);
+    private void executeList(List<EntityAction> entityActions, Connection connection) {
+        for (EntityAction action : entityActions) {
+            action.execute(connection);
         }
     }
 
@@ -84,4 +64,15 @@ public class ActionQueue {
         deletions.clear();
     }
 
+    public boolean hasDeleteActions() {
+        return !this.deletions.isEmpty();
+    }
+
+    public void clearDeleteActions() {
+        this.deletions.clear();
+    }
+
+    public List<EntityAction> getDeleteActions() {
+        return this.deletions;
+    }
 }
