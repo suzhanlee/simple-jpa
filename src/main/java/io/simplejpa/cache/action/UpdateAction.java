@@ -1,9 +1,8 @@
 package io.simplejpa.cache.action;
 
-import io.simplejpa.engine.jdbc.JdbcExecutor;
+import io.simplejpa.cache.EntityEntry;
 import io.simplejpa.engine.sql.SqlWithParameters;
-import io.simplejpa.engine.sql.UpdateSqlGenerator;
-import io.simplejpa.metadata.EntityMetadata;
+import io.simplejpa.persister.EntityUpdater;
 import lombok.extern.slf4j.Slf4j;
 
 import java.sql.Connection;
@@ -11,33 +10,24 @@ import java.sql.Connection;
 @Slf4j
 public class UpdateAction implements EntityAction {
     private final Object entity;
-    private final EntityMetadata metadata;
-    private final UpdateSqlGenerator updateSqlGenerator;
-    private final JdbcExecutor jdbcExecutor;
+    private final EntityEntry entityEntry;
+    private final EntityUpdater entityUpdater;
 
     public UpdateAction(
             Object entity,
-            UpdateSqlGenerator updateSqlGenerator,
-            EntityMetadata metadata,
-            JdbcExecutor jdbcExecutor
+            EntityEntry entityEntry,
+            EntityUpdater entityUpdater
     ) {
         this.entity = entity;
-        this.updateSqlGenerator = updateSqlGenerator;
-        this.metadata = metadata;
-        this.jdbcExecutor = jdbcExecutor;
+        this.entityEntry = entityEntry;
+        this.entityUpdater = entityUpdater;
     }
 
     @Override
     public void execute(Connection connection) {
-        SqlWithParameters sqlWithParameters = updateSqlGenerator.generateUpdateSql(
-                metadata,
-                entity
-        );
-        jdbcExecutor.executeUpdate(
-                connection,
-                sqlWithParameters.sql(),
-                sqlWithParameters.parameters()
-        );
+        entityUpdater.update(connection, entity, entityEntry);
+        Object[] updateValues = entityUpdater.extractUpdateValues(entity);
+        entityEntry.updateSnapShot(updateValues);
     }
 
     @Override

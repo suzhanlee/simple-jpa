@@ -315,10 +315,10 @@ public void addInsertAction(Object entity, EntityMetadata metadata) {
 
 ### Step 6.3: EntityUpdater (UPDATE 구현)
 
-- [ ] EntityUpdater 클래스 구현
-- [ ] 변경된 필드만 UPDATE
-- [ ] Dirty Checking과 통합
-- [ ] UpdateAction과 통합
+- [x] EntityUpdater 클래스 구현
+- [x] 변경된 필드만 UPDATE
+- [x] Dirty Checking과 통합
+- [x] UpdateAction과 통합
 
 **주요 컴포넌트**:
 

@@ -9,8 +9,8 @@ import io.simplejpa.engine.sql.DeleteSqlGenerator;
 import io.simplejpa.engine.sql.InsertSqlGenerator;
 import io.simplejpa.engine.sql.UpdateSqlGenerator;
 import io.simplejpa.metadata.MetadataRegistry;
-import io.simplejpa.persister.EntityLoader;
 import io.simplejpa.persister.EntityPersister;
+import io.simplejpa.persister.EntityUpdater;
 import lombok.extern.slf4j.Slf4j;
 
 import java.sql.Connection;
@@ -29,6 +29,7 @@ public class ActionQueue {
     private final DeleteSqlGenerator deleteSqlGenerator;
     private final JdbcExecutor jdbcExecutor;
     private final EntityPersister entityPersister;
+    private final EntityUpdater entityUpdater;
 
     public ActionQueue(
             MetadataRegistry metadataRegistry,
@@ -36,7 +37,8 @@ public class ActionQueue {
             UpdateSqlGenerator updateSqlGenerator,
             DeleteSqlGenerator deleteSqlGenerator,
             JdbcExecutor jdbcExecutor,
-            EntityPersister entityPersister
+            EntityPersister entityPersister,
+            EntityUpdater entityUpdater
     ) {
         this.metadataRegistry = metadataRegistry;
         this.insertSqlGenerator = insertSqlGenerator;
@@ -44,18 +46,18 @@ public class ActionQueue {
         this.deleteSqlGenerator = deleteSqlGenerator;
         this.jdbcExecutor = jdbcExecutor;
         this.entityPersister = new EntityPersister(jdbcExecutor, insertSqlGenerator, metadataRegistry);
+        this.entityUpdater = new EntityUpdater(metadataRegistry, updateSqlGenerator, jdbcExecutor);
     }
 
     public void addInsertion(Object entity) {
         insertions.add(new InsertAction(entity, entityPersister));
     }
 
-    public void addUpdate(Object entity) {
+    public void addUpdate(Object entity, EntityEntry entityEntry) {
         updates.add(new UpdateAction(
                 entity,
-                updateSqlGenerator,
-                metadataRegistry.getMetadata(entity.getClass()),
-                jdbcExecutor
+                entityEntry,
+                entityUpdater
         ));
     }
 

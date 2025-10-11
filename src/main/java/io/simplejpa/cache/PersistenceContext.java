@@ -69,10 +69,10 @@ public class PersistenceContext {
         entityEntries.forEach(this::detectDirtyEntity);
     }
 
-    private void detectDirtyEntity(Object entity, EntityEntry entry) {
+    private void detectDirtyEntity(Object entity, EntityEntry entityEntry) {
         EntityMetadata metadata = metadataRegistry.getMetadata(entity.getClass());
-        if (entry.isManaged() && entry.isModified(metadata)) {
-            actionQueue.addUpdate(entity);
+        if (entityEntry.isManaged() && entityEntry.isModified(metadata)) {
+            actionQueue.addUpdate(entity, entityEntry);
         }
     }
 
