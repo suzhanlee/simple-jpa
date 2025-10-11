@@ -9,6 +9,8 @@ import io.simplejpa.engine.sql.DeleteSqlGenerator;
 import io.simplejpa.engine.sql.InsertSqlGenerator;
 import io.simplejpa.engine.sql.UpdateSqlGenerator;
 import io.simplejpa.metadata.MetadataRegistry;
+import io.simplejpa.persister.EntityLoader;
+import io.simplejpa.persister.EntityPersister;
 import lombok.extern.slf4j.Slf4j;
 
 import java.sql.Connection;
@@ -26,28 +28,26 @@ public class ActionQueue {
     private final UpdateSqlGenerator updateSqlGenerator;
     private final DeleteSqlGenerator deleteSqlGenerator;
     private final JdbcExecutor jdbcExecutor;
+    private final EntityPersister entityPersister;
 
     public ActionQueue(
             MetadataRegistry metadataRegistry,
             InsertSqlGenerator insertSqlGenerator,
             UpdateSqlGenerator updateSqlGenerator,
             DeleteSqlGenerator deleteSqlGenerator,
-            JdbcExecutor jdbcExecutor
+            JdbcExecutor jdbcExecutor,
+            EntityPersister entityPersister
     ) {
         this.metadataRegistry = metadataRegistry;
         this.insertSqlGenerator = insertSqlGenerator;
         this.updateSqlGenerator = updateSqlGenerator;
         this.deleteSqlGenerator = deleteSqlGenerator;
         this.jdbcExecutor = jdbcExecutor;
+        this.entityPersister = new EntityPersister(jdbcExecutor, insertSqlGenerator, metadataRegistry);
     }
 
     public void addInsertion(Object entity) {
-        insertions.add(new InsertAction(
-                entity,
-                metadataRegistry.getMetadata(entity.getClass()),
-                insertSqlGenerator,
-                jdbcExecutor
-        ));
+        insertions.add(new InsertAction(entity, entityPersister));
     }
 
     public void addUpdate(Object entity) {

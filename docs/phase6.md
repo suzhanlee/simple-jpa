@@ -182,10 +182,10 @@ public <T> T find(Class<T> entityClass, Object primaryKey) {
 
 ### Step 6.2: EntityPersister (INSERT 구현)
 
-- [ ] EntityPersister 클래스 구현
-- [ ] 엔티티를 INSERT SQL로 변환
-- [ ] 생성된 ID 자동 설정 (Auto-increment 지원)
-- [ ] InsertAction과 통합
+- [x] EntityPersister 클래스 구현
+- [x] 엔티티를 INSERT SQL로 변환
+- [x] 생성된 ID 자동 설정 (Auto-increment 지원)
+- [x] InsertAction과 통합
 
 **주요 컴포넌트**:
 
