@@ -53,9 +53,23 @@ public class PersistenceContext {
 
     public void removeEntity(Object entity) {
         EntityEntry entry = entityEntries.get(entity);
-        if (entry != null && entry.isManaged()) {
-            entry.markAsRemoved();
-            actionQueue.addDeletion(entity);
+        validateRemovable(entry);
+
+        entry.markAsRemoved();
+        actionQueue.addDeletion(entity);
+    }
+
+    private void validateRemovable(EntityEntry entry) {
+        if (entry == null) {
+            throw new IllegalArgumentException("Entity is not managed by the persistence context");
+        }
+
+        if (!entry.isManaged()) {
+            throw new IllegalStateException("Entity is in detached state and cannot be removed");
+        }
+
+        if (entry.isRemoved()) {
+            throw new IllegalStateException("Entity is already removed");
         }
     }
 

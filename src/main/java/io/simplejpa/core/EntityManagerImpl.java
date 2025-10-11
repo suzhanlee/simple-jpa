@@ -58,8 +58,20 @@ public class EntityManagerImpl implements EntityManager {
 
     @Override
     public void persist(Object entity) {
-        validateOpen();
+        validatePersistable(entity);
         persistenceContext.addEntity(entity);
+    }
+
+    private void validatePersistable(Object entity) {
+        validateOpen();
+        validateTransactionIsActive();
+        if (entity == null) {
+            throw new IllegalArgumentException("Entity is null");
+        }
+
+        if (persistenceContext.contains(entity)) {
+            throw new IllegalArgumentException("Entity is already managed by the persistence context");
+        }
     }
 
     private void validateOpen() {
@@ -70,8 +82,7 @@ public class EntityManagerImpl implements EntityManager {
 
     @Override
     public <T> T find(Class<T> entityClass, Object primaryKey) {
-        validateOpen();
-
+        validateQueryable(entityClass, primaryKey);
         T entity = persistenceContext.getEntity(entityClass, primaryKey);
         if (entity != null) {
             return entity;
@@ -84,6 +95,17 @@ public class EntityManagerImpl implements EntityManager {
             persistenceContext.addEntity(entity);
         }
         return entity;
+    }
+
+    private <T> void validateQueryable(Class<T> entityClass, Object primaryKey) {
+        validateOpen();
+        if (entityClass == null) {
+            throw new IllegalArgumentException("Entity class must not be null");
+        }
+
+        if (primaryKey == null) {
+            throw new IllegalArgumentException("Primary key must not be null");
+        }
     }
 
     @Override
@@ -101,9 +123,13 @@ public class EntityManagerImpl implements EntityManager {
 
     @Override
     public void flush() {
+        validateFlushable();
+        persistenceContext.flush(jdbcTransaction.getConnection());
+    }
+
+    private void validateFlushable() {
         validateOpen();
         validateTransactionIsActive();
-        persistenceContext.flush(jdbcTransaction.getConnection());
     }
 
     private void validateTransactionIsActive() {
