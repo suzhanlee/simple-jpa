@@ -52,12 +52,12 @@ SELECT COUNT(u) FROM User u
 ```
 
 ### Step 7.3: JPQL → SQL 변환
-- [ ] QueryTranslator 클래스 구현
-- [ ] 엔티티 이름 → 테이블 이름 변환 (메타데이터 활용)
-- [ ] 필드 이름 → 컬럼 이름 변환
-- [ ] WHERE 조건 변환
-- [ ] NamedParameter 처리 (:name)
-- [ ] PositionalParameter 처리 (?1)
+- [x] QueryTranslator 클래스 구현
+- [x] 엔티티 이름 → 테이블 이름 변환 (메타데이터 활용)
+- [x] 필드 이름 → 컬럼 이름 변환
+- [x] WHERE 조건 변환
+- [x] NamedParameter 처리 (:name)
+- [x] PositionalParameter 처리 (?1)
 
 **변환 예시**:
 ```
