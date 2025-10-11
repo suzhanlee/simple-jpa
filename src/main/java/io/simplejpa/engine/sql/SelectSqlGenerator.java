@@ -11,17 +11,6 @@ public class SelectSqlGenerator {
         return new SqlWithParameters(selectSql, List.of(id));
     }
 
-    private List<String> extractColumNames(EntityMetadata metadata) {
-        return metadata.getAttributeMetadatas()
-                .stream()
-                .map(AttributeMetadata::getColumnName)
-                .toList();
-    }
-
-    private String extractIdColumName(EntityMetadata metadata) {
-        return metadata.getIdentifierMetadata().getColumnName();
-    }
-
     private String createSelectSql(EntityMetadata metadata) {
         SqlBuilder builder = new SqlBuilder();
         String selectPart = builder
@@ -38,5 +27,16 @@ public class SelectSqlGenerator {
                 .build();
 
         return selectPart + " " + wherePart;
+    }
+
+    private List<String> extractColumNames(EntityMetadata metadata) {
+        return metadata.getAttributeMetadatas()
+                .stream()
+                .map(AttributeMetadata::getColumnName)
+                .toList();
+    }
+
+    private String extractIdColumName(EntityMetadata metadata) {
+        return metadata.getIdentifierMetadata().getColumnName();
     }
 }

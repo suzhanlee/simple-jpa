@@ -53,26 +53,56 @@ public class PersistenceContext {
 
     public void removeEntity(Object entity) {
         EntityEntry entry = entityEntries.get(entity);
-        if (entry != null && entry.isManaged()) {
-            entry.markAsRemoved();
-            actionQueue.addDeletion(entity);
+        validateRemovable(entry);
+
+        entry.markAsRemoved();
+        actionQueue.addDeletion(entity);
+    }
+
+    private void validateRemovable(EntityEntry entry) {
+        if (entry == null) {
+            throw new IllegalArgumentException("Entity is not managed by the persistence context");
+        }
+
+        if (!entry.isManaged()) {
+            throw new IllegalStateException("Entity is in detached state and cannot be removed");
+        }
+
+        if (entry.isRemoved()) {
+            throw new IllegalStateException("Entity is already removed");
         }
     }
 
     public void flush(Connection connection) {
         detectDirtyEntities();
         actionQueue.executeActions(connection);
-        // flush 하더라도 1차 캐시는 유지된다.
+        removeEntityFromFirstCacheAndEntries();
+    }
+
+    private void removeEntityFromFirstCacheAndEntries() {
+        for (Object removedEntity : findRemovedEntities()) {
+            EntityMetadata metadata = metadataRegistry.getMetadata(removedEntity.getClass());
+            Object idValue = metadata.getIdentifierMetadata().getValue(removedEntity);
+            firstLevelCache.remove(new EntityKey(removedEntity.getClass(), idValue));
+            entityEntries.remove(removedEntity);
+        }
+    }
+
+    private List<Object> findRemovedEntities() {
+        return entityEntries.entrySet().stream()
+                .filter(entry -> entry.getValue().isRemoved())
+                .map(Map.Entry::getKey)
+                .toList();
     }
 
     private void detectDirtyEntities() {
         entityEntries.forEach(this::detectDirtyEntity);
     }
 
-    private void detectDirtyEntity(Object entity, EntityEntry entry) {
+    private void detectDirtyEntity(Object entity, EntityEntry entityEntry) {
         EntityMetadata metadata = metadataRegistry.getMetadata(entity.getClass());
-        if (entry.isManaged() && entry.isModified(metadata)) {
-            actionQueue.addUpdate(entity);
+        if (entityEntry.isManaged() && entityEntry.isModified(metadata)) {
+            actionQueue.addUpdate(entity, entityEntry);
         }
     }
 

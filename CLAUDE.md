@@ -209,23 +209,18 @@ String name = proxy.getName();  // 이 시점에 DB에서 로드
 - **향후 개선 계획**: Phase 6에서 조회 작업의 트랜잭션 선택적 지원 추가 가능
 
 ### Phase 5: 영속성 컨텍스트
-- [ ] PersistenceContext 구현
-- [ ] 1차 캐시 (IdentityMap)
-- [ ] Entity 상태 관리 (EntityEntry)
-- [ ] ActionQueue (쓰기 지연)
+- [x] PersistenceContext 구현
+- [x] 1차 캐시 (IdentityMap)
+- [x] Entity 상태 관리 (EntityEntry)
+- [x] ActionQueue (쓰기 지연)
 
 ### Phase 6: CRUD 연산 (Persister)
-- [ ] persist() - INSERT 실행
-- [ ] find() - SELECT by ID 실행 (트랜잭션 선택적 지원 고려)
-- [ ] merge() - UPDATE 실행
-- [ ] remove() - DELETE 실행
-- [ ] flush() - ActionQueue 실행
-- [ ] Dirty Checking
-
-**Phase 6 개선 TODO**:
-- [ ] find() 메서드에서 트랜잭션 없이도 조회 가능하도록 개선 (선택사항)
-  - 활성 트랜잭션 있으면 해당 Connection 사용
-  - 없으면 임시 Connection 생성 (auto-commit 모드)
+- [x] persist() - INSERT 실행
+- [x] find() - SELECT by ID 실행 (트랜잭션 선택적 지원 고려)
+- [x] merge() - UPDATE 실행
+- [x] remove() - DELETE 실행
+- [x] flush() - ActionQueue 실행
+- [x] Dirty Checking
 
 ### Phase 7: 쿼리 처리 (기본)
 - [ ] JPQL 파서 (간단한 SELECT만)

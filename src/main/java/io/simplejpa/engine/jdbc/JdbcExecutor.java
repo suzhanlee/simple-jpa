@@ -18,6 +18,34 @@ public class JdbcExecutor {
         this.parameterBinder = parameterBinder;
     }
 
+    public Object executeInsert(
+            Connection connection,
+            String sql,
+            Object... params
+    ) {
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        try {
+            pstmt = connection.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);
+
+            parameterBinder.bind(pstmt, params);
+
+            pstmt.executeUpdate();
+
+            rs = pstmt.getGeneratedKeys();
+            if (rs.next()) {
+                return rs.getObject(1);
+            } else {
+                return null;
+            }
+        } catch (SQLException e) {
+            throw new JdbcException("Failed to execute insert: " + sql, e);
+        } finally {
+            closePrepareStatement(pstmt);
+            closeResultSet(rs);
+        }
+    }
+
     public int executeUpdate(
             Connection connection,
             String sql,

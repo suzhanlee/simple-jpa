@@ -2,23 +2,28 @@ package io.simplejpa.core;
 
 import io.simplejpa.cache.PersistenceContext;
 import io.simplejpa.engine.connection.ConnectionProvider;
-import io.simplejpa.metadata.MetadataRegistry;
+import io.simplejpa.persister.EntityLoader;
 import io.simplejpa.transaction.JdbcTransaction;
 
 public class EntityManagerImpl implements EntityManager {
     private final PersistenceContext persistenceContext;
-    private final MetadataRegistry metadataRegistry;
     private final JdbcTransaction jdbcTransaction;
+    private final EntityLoader entityLoader;
     private boolean open;
 
     public EntityManagerImpl(
             PersistenceContext persistenceContext,
-            MetadataRegistry metadataRegistry,
-            ConnectionProvider connectionProvider
+            ConnectionProvider connectionProvider,
+            EntityLoader entityLoader
     ) {
         this.persistenceContext = persistenceContext;
-        this.metadataRegistry = metadataRegistry;
         this.jdbcTransaction = new JdbcTransaction(connectionProvider);
+
+        // call back
+        this.jdbcTransaction.setFlushCallback(this::flush);
+        this.jdbcTransaction.setClearCallback(persistenceContext::clear);
+
+        this.entityLoader = entityLoader;
         this.open = true;
     }
 
@@ -53,8 +58,20 @@ public class EntityManagerImpl implements EntityManager {
 
     @Override
     public void persist(Object entity) {
-        validateOpen();
+        validatePersistable(entity);
         persistenceContext.addEntity(entity);
+    }
+
+    private void validatePersistable(Object entity) {
+        validateOpen();
+        validateTransactionIsActive();
+        if (entity == null) {
+            throw new IllegalArgumentException("Entity is null");
+        }
+
+        if (persistenceContext.contains(entity)) {
+            throw new IllegalArgumentException("Entity is already managed by the persistence context");
+        }
     }
 
     private void validateOpen() {
@@ -65,14 +82,30 @@ public class EntityManagerImpl implements EntityManager {
 
     @Override
     public <T> T find(Class<T> entityClass, Object primaryKey) {
-        validateOpen();
-
+        validateQueryable(entityClass, primaryKey);
         T entity = persistenceContext.getEntity(entityClass, primaryKey);
         if (entity != null) {
             return entity;
         }
-        // TODO DB 조회 필요
-        throw new UnsupportedOperationException("Not yet implemented");
+
+        validateTransactionIsActive();
+
+        entity = entityLoader.load(jdbcTransaction.getConnection(), entityClass, primaryKey);
+        if (entity != null) {
+            persistenceContext.addEntity(entity);
+        }
+        return entity;
+    }
+
+    private <T> void validateQueryable(Class<T> entityClass, Object primaryKey) {
+        validateOpen();
+        if (entityClass == null) {
+            throw new IllegalArgumentException("Entity class must not be null");
+        }
+
+        if (primaryKey == null) {
+            throw new IllegalArgumentException("Primary key must not be null");
+        }
     }
 
     @Override
@@ -90,9 +123,13 @@ public class EntityManagerImpl implements EntityManager {
 
     @Override
     public void flush() {
+        validateFlushable();
+        persistenceContext.flush(jdbcTransaction.getConnection());
+    }
+
+    private void validateFlushable() {
         validateOpen();
         validateTransactionIsActive();
-        persistenceContext.flush(jdbcTransaction.getConnection());
     }
 
     private void validateTransactionIsActive() {
