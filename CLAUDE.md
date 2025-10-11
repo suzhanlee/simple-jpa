@@ -223,11 +223,11 @@ String name = proxy.getName();  // 이 시점에 DB에서 로드
 - [x] Dirty Checking
 
 ### Phase 7: 쿼리 처리 (기본)
-- [ ] JPQL 파서 (간단한 SELECT만)
-- [ ] JPQL → SQL 변환
-- [ ] Query 인터페이스
-- [ ] TypedQuery
-- [ ] Parameter Binding
+- [x] JPQL 파서 (간단한 SELECT만)
+- [x] JPQL → SQL 변환
+- [x] Query 인터페이스
+- [x] TypedQuery
+- [x] Parameter Binding
 
 ### Phase 8: 관계 매핑
 - [ ] @OneToOne

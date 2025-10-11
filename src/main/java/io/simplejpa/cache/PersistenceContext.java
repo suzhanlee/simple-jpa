@@ -3,6 +3,7 @@ package io.simplejpa.cache;
 import io.simplejpa.metadata.AttributeMetadata;
 import io.simplejpa.metadata.EntityMetadata;
 import io.simplejpa.metadata.MetadataRegistry;
+import lombok.Getter;
 
 import java.sql.Connection;
 import java.util.HashMap;
@@ -10,6 +11,7 @@ import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 
+@Getter
 public class PersistenceContext {
     private final Map<EntityKey, Object> firstLevelCache = new HashMap<>();
     private final Map<Object, EntityEntry> entityEntries = new IdentityHashMap<>(); // 객체 동일성 비교 필요

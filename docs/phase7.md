@@ -74,10 +74,10 @@ SQL:  SELECT * FROM users WHERE name = ?
 - [x] NULL 처리
 
 ### Step 7.5: EntityManager 쿼리 메서드 추가
-- [ ] `createQuery(String jpql)` 구현
-- [ ] `createQuery(String jpql, Class<T> resultClass)` 구현
-- [ ] Query 실행 → ResultSet → Entity 변환
-- [ ] PersistenceContext와 통합 (캐시 활용)
+- [x] `createQuery(String jpql)` 구현
+- [x] `createQuery(String jpql, Class<T> resultClass)` 구현
+- [x] Query 실행 → ResultSet → Entity 변환
+- [x] PersistenceContext와 통합 (캐시 활용)
 
 ---
 

@@ -2,22 +2,50 @@ package io.simplejpa.core;
 
 import io.simplejpa.cache.PersistenceContext;
 import io.simplejpa.engine.connection.ConnectionProvider;
+import io.simplejpa.engine.jdbc.EntityResultSetExtractor;
+import io.simplejpa.engine.jdbc.ParameterBinder;
+import io.simplejpa.metadata.EntityMetadata;
+import io.simplejpa.metadata.MetadataRegistry;
 import io.simplejpa.persister.EntityLoader;
+import io.simplejpa.query.Query;
+import io.simplejpa.query.QueryImpl;
+import io.simplejpa.query.TypedQuery;
+import io.simplejpa.query.TypedQueryImpl;
+import io.simplejpa.query.jpql.JpqlParser;
+import io.simplejpa.query.jpql.QueryExecutor;
+import io.simplejpa.query.jpql.QueryTranslator;
+import io.simplejpa.query.jpql.TranslatedQuery;
+import io.simplejpa.query.jpql.ast.SelectStatement;
 import io.simplejpa.transaction.JdbcTransaction;
+import io.simplejpa.util.TypeConverter;
 
-public class EntityManagerImpl implements EntityManager {
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+public class EntityManagerImpl implements EntityManager, QueryExecutor {
+    private final MetadataRegistry metadataRegistry;
     private final PersistenceContext persistenceContext;
     private final JdbcTransaction jdbcTransaction;
     private final EntityLoader entityLoader;
+    private final ParameterBinder parameterBinder;
     private boolean open;
 
     public EntityManagerImpl(
+            MetadataRegistry metadataRegistry,
             PersistenceContext persistenceContext,
             ConnectionProvider connectionProvider,
-            EntityLoader entityLoader
+            EntityLoader entityLoader,
+            ParameterBinder parameterBinder
     ) {
+        this.metadataRegistry = metadataRegistry;
         this.persistenceContext = persistenceContext;
         this.jdbcTransaction = new JdbcTransaction(connectionProvider);
+        this.parameterBinder = parameterBinder;
 
         // call back
         this.jdbcTransaction.setFlushCallback(this::flush);
@@ -142,5 +170,88 @@ public class EntityManagerImpl implements EntityManager {
     public boolean contains(Object entity) {
         validateOpen();
         return persistenceContext.contains(entity);
+    }
+
+    @Override
+    public <T> List<T> executeQuery(
+            String jpql,
+            Class<T> resultClass,
+            Map<String, Object> namedParameters,
+            Map<Integer, Object> positionalParameters
+    ) {
+        JpqlParser jpqlParser = new JpqlParser();
+        SelectStatement parsedStatement = jpqlParser.parse(jpql);
+
+        QueryTranslator queryTranslator = new QueryTranslator(metadataRegistry);
+        TranslatedQuery translatedQuery = queryTranslator.translate(parsedStatement);
+
+        try {
+            Connection connection = jdbcTransaction.getConnection();
+            PreparedStatement pstmt = connection.prepareStatement(translatedQuery.sql());
+
+            parameterBinder.bindQueryParameters(
+                    pstmt,
+                    translatedQuery.parameterOrder(),
+                    namedParameters,
+                    positionalParameters
+            );
+
+            ResultSet resultSet = pstmt.executeQuery();
+            return mapResultSet(resultSet, resultClass);
+        } catch (SQLException e) {
+            throw new RuntimeException("Query execution failed", e);
+        }
+    }
+
+    @Override
+    public Query createQuery(String jpql) {
+        validateOpen();
+        return new QueryImpl(jpql, this);
+    }
+
+    @Override
+    public <T> TypedQuery<T> createQuery(String jpql, Class<T> resultClass) {
+        validateOpen();
+        return new TypedQueryImpl<>(jpql, this, resultClass);
+    }
+
+    private <T> List<T> mapResultSet(
+            ResultSet rs,
+            Class<T> resultClass
+    ) throws SQLException {
+        List<T> results = new ArrayList<>();
+        EntityMetadata metadata = metadataRegistry.getMetadata(resultClass);
+        TypeConverter typeConverter = new TypeConverter();
+
+        while (rs.next()) {
+            T entity = createEntityByResultSet(rs, resultClass, metadata, typeConverter);
+            results.add(entity);
+        }
+
+        return results;
+    }
+
+    private <T> T createEntityByResultSet(
+            ResultSet rs,
+            Class<T> resultClass,
+            EntityMetadata metadata,
+            TypeConverter typeConverter
+    ) throws SQLException {
+        T entity = findFromFirstCache(rs, resultClass, metadata);
+        if (entity == null) {
+            EntityResultSetExtractor<T> extractor = new EntityResultSetExtractor<>(metadata, typeConverter);
+            entity = extractor.extractData(rs);
+            persistenceContext.addEntity(entity);
+        }
+        return entity;
+    }
+
+    private <T> T findFromFirstCache(
+            ResultSet rs,
+            Class<T> resultClass,
+            EntityMetadata metadata
+    ) throws SQLException {
+        Object id = rs.getObject(metadata.getIdentifierMetadata().getColumnName());
+        return persistenceContext.getEntity(resultClass, id);
     }
 }
