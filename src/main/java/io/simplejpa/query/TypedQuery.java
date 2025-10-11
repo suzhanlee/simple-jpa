@@ -7,7 +7,7 @@ public interface TypedQuery<T> {
 
     T getSingleResult();
 
-    void setParameter(String name, Object value); // named
+    TypedQuery<T> setParameter(String name, Object value); // named
 
-    void setParameter(int position, Object value); // positional
+    TypedQuery<T> setParameter(int position, Object value); // positional
 }

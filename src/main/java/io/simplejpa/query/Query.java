@@ -7,7 +7,7 @@ public interface Query {
 
     Object getSingleResult();
 
-    void setParameter(String name, Object value); // named
+    Query setParameter(String name, Object value); // named
 
-    void setParameter(int position, Object value); // positional
+    Query setParameter(int position, Object value); // positional
 }

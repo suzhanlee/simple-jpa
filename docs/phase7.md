@@ -67,11 +67,11 @@ SQL:  SELECT * FROM users WHERE name = ?
 ```
 
 ### Step 7.4: Parameter Binding
-- [ ] ParameterBinder 확장
-- [ ] Named Parameter 바인딩 (:name → ?)
-- [ ] Positional Parameter 바인딩 (?1 → ?)
-- [ ] 파라미터 타입 검증
-- [ ] NULL 처리
+- [x] ParameterBinder 확장
+- [x] Named Parameter 바인딩 (:name → ?)
+- [x] Positional Parameter 바인딩 (?1 → ?)
+- [x] 파라미터 타입 검증
+- [x] NULL 처리
 
 ### Step 7.5: EntityManager 쿼리 메서드 추가
 - [ ] `createQuery(String jpql)` 구현

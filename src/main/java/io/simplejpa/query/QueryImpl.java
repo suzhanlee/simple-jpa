@@ -1,9 +1,12 @@
 package io.simplejpa.query;
 
+import lombok.Getter;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Getter
 public class QueryImpl implements Query {
     private final String jpql;
     private final Map<String, Object> namedParameters;
@@ -26,12 +29,14 @@ public class QueryImpl implements Query {
     }
 
     @Override
-    public void setParameter(String name, Object value) {
+    public Query setParameter(String name, Object value) {
         namedParameters.put(name, value);
+        return this;
     }
 
     @Override
-    public void setParameter(int position, Object value) {
+    public Query setParameter(int position, Object value) {
         positionalParameters.put(position, value);
+        return this;
     }
 }
