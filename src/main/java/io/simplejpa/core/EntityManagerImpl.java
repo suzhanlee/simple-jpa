@@ -2,23 +2,23 @@ package io.simplejpa.core;
 
 import io.simplejpa.cache.PersistenceContext;
 import io.simplejpa.engine.connection.ConnectionProvider;
-import io.simplejpa.metadata.MetadataRegistry;
+import io.simplejpa.persister.EntityLoader;
 import io.simplejpa.transaction.JdbcTransaction;
 
 public class EntityManagerImpl implements EntityManager {
     private final PersistenceContext persistenceContext;
-    private final MetadataRegistry metadataRegistry;
     private final JdbcTransaction jdbcTransaction;
+    private final EntityLoader entityLoader;
     private boolean open;
 
     public EntityManagerImpl(
             PersistenceContext persistenceContext,
-            MetadataRegistry metadataRegistry,
-            ConnectionProvider connectionProvider
+            ConnectionProvider connectionProvider,
+            EntityLoader entityLoader
     ) {
         this.persistenceContext = persistenceContext;
-        this.metadataRegistry = metadataRegistry;
         this.jdbcTransaction = new JdbcTransaction(connectionProvider);
+        this.entityLoader = entityLoader;
         this.open = true;
     }
 
@@ -71,8 +71,14 @@ public class EntityManagerImpl implements EntityManager {
         if (entity != null) {
             return entity;
         }
-        // TODO DB 조회 필요
-        throw new UnsupportedOperationException("Not yet implemented");
+
+        validateTransactionIsActive();
+
+        entity = entityLoader.load(jdbcTransaction.getConnection(), entityClass, primaryKey);
+        if (entity != null) {
+            persistenceContext.addEntity(entity);
+        }
+        return entity;
     }
 
     @Override

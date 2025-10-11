@@ -12,17 +12,20 @@ Phase 6에서는 **Persister 계층**을 구현하여 실제 CRUD 작업을 수�
 ## 핵심 개념
 
 ### Persister란?
+
 - **엔티티와 데이터베이스 사이의 브릿지**: 객체를 SQL로, SQL 결과를 객체로 변환
 - **영속성 컨텍스트와 긴밀히 협력**: 1차 캐시, Dirty Checking, ActionQueue와 통합
 - **책임 분리**: 각 작업(INSERT, SELECT, UPDATE, DELETE)을 전문 클래스로 분리
 
 ### 주요 Persister 클래스
+
 - **EntityPersister**: INSERT 작업 수행 (persist)
 - **EntityLoader**: SELECT 작업 수행 (find)
 - **EntityUpdater**: UPDATE 작업 수행 (merge, Dirty Checking)
 - **EntityDeleter**: DELETE 작업 수행 (remove)
 
 ### 핵심 플로우
+
 ```
 EntityManager.persist(entity)
     ↓
@@ -43,67 +46,61 @@ SQL Generator → JDBC Executor → DB
 
 ### Step 6.1: EntityLoader (SELECT 구현)
 
-- [ ] EntityLoader 클래스 구현
-- [ ] ID로 엔티티 조회
-- [ ] ResultSet → 엔티티 객체 변환
-- [ ] 1차 캐시 통합
-- [ ] 트랜잭션 선택적 지원 (개선)
+- [x] EntityLoader 클래스 구현
+- [x] ID로 엔티티 조회
+- [x] ResultSet → 엔티티 객체 변환
+- [x] 1차 캐시 통합
+- [x] 트랜잭션 선택적 지원 (개선)
 
 **주요 컴포넌트**:
+
 - `EntityLoader`: 엔티티 로딩 전문 클래스
 
 **핵심 기능**:
+
 - SELECT SQL 생성 (Phase 3의 SelectSqlGenerator 활용)
 - JDBC로 쿼리 실행
 - ResultSet을 엔티티 객체로 변환
 - 로드된 엔티티를 영속성 컨텍스트에 추가 (스냅샷 포함)
 
 **설계**:
+
 ```java
 public class EntityLoader {
-    private final JdbcExecutor jdbcExecutor;
     private final MetadataRegistry metadataRegistry;
+    private final SelectSqlGenerator selectSqlGenerator;
+    private final JdbcExecutor jdbcExecutor;
 
-    public <T> T load(Class<T> entityClass, Object id) {
+    public EntityLoader(
+            MetadataRegistry metadataRegistry,
+            SelectSqlGenerator selectSqlGenerator,
+            JdbcExecutor jdbcExecutor
+    ) {
+        this.metadataRegistry = metadataRegistry;
+        this.selectSqlGenerator = selectSqlGenerator;
+        this.jdbcExecutor = jdbcExecutor;
+    }
+
+    public <T> T load(Connection connection, Class<T> entityClass, Object id) {
         // 1. 메타데이터 조회
         EntityMetadata metadata = metadataRegistry.getMetadata(entityClass);
 
         // 2. SELECT SQL 생성
-        SqlWithParameters sql = SelectSqlGenerator.generateById(metadata, id);
+        SqlWithParameters sql = selectSqlGenerator.generateFindById(metadata, id);
 
-        // 3. SQL 실행
-        ResultSet rs = jdbcExecutor.executeQuery(sql);
-
-        // 4. ResultSet → 엔티티 변환
-        if (rs.next()) {
-            return mapResultSetToEntity(rs, metadata, entityClass);
-        }
-
-        return null;
-    }
-
-    private <T> T mapResultSetToEntity(ResultSet rs, EntityMetadata metadata,
-                                        Class<T> entityClass) throws SQLException {
-        // 리플렉션으로 엔티티 인스턴스 생성
-        T entity = entityClass.getDeclaredConstructor().newInstance();
-
-        // ID 필드 설정
-        IdentifierMetadata idMetadata = metadata.getIdentifier();
-        Object idValue = rs.getObject(idMetadata.getColumnName());
-        idMetadata.setValue(entity, idValue);
-
-        // 일반 필드 설정
-        for (AttributeMetadata attr : metadata.getAttributes()) {
-            Object value = rs.getObject(attr.getColumnName());
-            attr.setValue(entity, value);
-        }
-
-        return entity;
+        // 3. SQL 실행 (Connection은 파라미터로 전달)
+        return jdbcExecutor.executeQuery(
+            connection,
+            sql.sql(),
+            new EntityResultSetExtractor<>(metadata, new TypeConverter()),
+            sql.parameters()
+        );
     }
 }
 ```
 
 **EntityManager.find() 통합**:
+
 ```java
 @Override
 public <T> T find(Class<T> entityClass, Object primaryKey) {
@@ -116,14 +113,16 @@ public <T> T find(Class<T> entityClass, Object primaryKey) {
         return cached;
     }
 
-    // 2. DB에서 로드
-    EntityLoader loader = new EntityLoader(getJdbcExecutor(), metadataRegistry);
-    T entity = loader.load(entityClass, primaryKey);
+    // 2. DB에서 로드 (트랜잭션의 Connection 전달)
+    T entity = entityLoader.load(
+        transaction.getConnection(),
+        entityClass,
+        primaryKey
+    );
 
     if (entity != null) {
-        // 3. 영속성 컨텍스트에 추가 (스냅샷 포함)
-        EntityMetadata metadata = metadataRegistry.getMetadata(entityClass);
-        persistenceContext.addEntity(entity, metadata);
+        // 3. 영속성 컨텍스트에 추가 (스냅샷 자동 생성)
+        persistenceContext.addEntity(entity);
     }
 
     return entity;
@@ -131,7 +130,9 @@ public <T> T find(Class<T> entityClass, Object primaryKey) {
 ```
 
 **트랜잭션 선택적 지원 (개선안)**:
+
 ```java
+
 @Override
 public <T> T find(Class<T> entityClass, Object primaryKey) {
     checkOpen();
@@ -187,15 +188,18 @@ public <T> T find(Class<T> entityClass, Object primaryKey) {
 - [ ] InsertAction과 통합
 
 **주요 컴포넌트**:
+
 - `EntityPersister`: 엔티티 삽입 전문 클래스
 
 **핵심 기능**:
+
 - INSERT SQL 생성 (Phase 3의 InsertSqlGenerator 활용)
 - JDBC로 INSERT 실행
 - 생성된 ID (Auto-increment) 엔티티에 자동 설정
 - 영속성 컨텍스트에 엔티티 추가
 
 **설계**:
+
 ```java
 public class EntityPersister {
     private final JdbcExecutor jdbcExecutor;
@@ -220,6 +224,7 @@ public class EntityPersister {
 ```
 
 **JdbcExecutor.executeInsert() 구현**:
+
 ```java
 public Long executeInsert(SqlWithParameters sqlWithParams) throws SQLException {
     String sql = sqlWithParams.getSql();
@@ -250,6 +255,7 @@ public Long executeInsert(SqlWithParameters sqlWithParams) throws SQLException {
 ```
 
 **InsertAction 구현**:
+
 ```java
 public class InsertAction implements EntityAction {
     private final Object entity;
@@ -272,7 +278,9 @@ public class InsertAction implements EntityAction {
 ```
 
 **EntityManager.persist() 구현**:
+
 ```java
+
 @Override
 public void persist(Object entity) {
     checkOpen();
@@ -290,6 +298,7 @@ public void persist(Object entity) {
 ```
 
 **PersistenceContext에 addInsertAction 추가**:
+
 ```java
 public void addInsertAction(Object entity, EntityMetadata metadata) {
     // INSERT 액션을 큐에 추가
@@ -312,15 +321,18 @@ public void addInsertAction(Object entity, EntityMetadata metadata) {
 - [ ] UpdateAction과 통합
 
 **주요 컴포넌트**:
+
 - `EntityUpdater`: 엔티티 업데이트 전문 클래스
 
 **핵심 기능**:
+
 - UPDATE SQL 생성 (Phase 3의 UpdateSqlGenerator 활용)
 - 변경된 필드만 UPDATE (성능 최적화)
 - JDBC로 UPDATE 실행
 - 스냅샷 갱신
 
 **설계**:
+
 ```java
 public class EntityUpdater {
     private final JdbcExecutor jdbcExecutor;
@@ -334,7 +346,7 @@ public class EntityUpdater {
         Object[] currentState = extractCurrentState(entity, metadata);
         Object[] loadedState = entityEntry.getLoadedState();
         Map<String, Object> changedFields = detectChanges(
-            metadata, currentState, loadedState);
+                metadata, currentState, loadedState);
 
         if (changedFields.isEmpty()) {
             return; // 변경사항 없음
@@ -342,7 +354,7 @@ public class EntityUpdater {
 
         // 3. UPDATE SQL 생성
         SqlWithParameters sql = UpdateSqlGenerator.generate(
-            entity, metadata, changedFields);
+                entity, metadata, changedFields);
 
         // 4. SQL 실행
         jdbcExecutor.executeUpdate(sql);
@@ -352,8 +364,8 @@ public class EntityUpdater {
     }
 
     private Map<String, Object> detectChanges(EntityMetadata metadata,
-                                               Object[] currentState,
-                                               Object[] loadedState) {
+                                              Object[] currentState,
+                                              Object[] loadedState) {
         Map<String, Object> changes = new HashMap<>();
         List<AttributeMetadata> attributes = metadata.getAttributes();
 
@@ -373,6 +385,7 @@ public class EntityUpdater {
 ```
 
 **UpdateAction 구현**:
+
 ```java
 public class UpdateAction implements EntityAction {
     private final Object entity;
@@ -397,6 +410,7 @@ public class UpdateAction implements EntityAction {
 ```
 
 **PersistenceContext의 Dirty Checking 개선**:
+
 ```java
 public void detectDirtyEntities(MetadataRegistry registry) {
     for (Map.Entry<Object, EntityEntry> entry : entityEntries.entrySet()) {
@@ -416,7 +430,9 @@ public void detectDirtyEntities(MetadataRegistry registry) {
 ```
 
 **EntityManager.merge() 구현**:
+
 ```java
+
 @Override
 public <T> T merge(T entity) {
     checkOpen();
@@ -467,14 +483,17 @@ private void copyFields(Object source, Object target, EntityMetadata metadata) {
 - [ ] DeleteAction과 통합
 
 **주요 컴포넌트**:
+
 - `EntityDeleter`: 엔티티 삭제 전문 클래스
 
 **핵심 기능**:
+
 - DELETE SQL 생성 (Phase 3의 DeleteSqlGenerator 활용)
 - JDBC로 DELETE 실행
 - 영속성 컨텍스트에서 엔티티 제거
 
 **설계**:
+
 ```java
 public class EntityDeleter {
     private final JdbcExecutor jdbcExecutor;
@@ -494,6 +513,7 @@ public class EntityDeleter {
 ```
 
 **DeleteAction 구현**:
+
 ```java
 public class DeleteAction implements EntityAction {
     private final Object entity;
@@ -516,7 +536,9 @@ public class DeleteAction implements EntityAction {
 ```
 
 **EntityManager.remove() 구현**:
+
 ```java
+
 @Override
 public void remove(Object entity) {
     checkOpen();
@@ -533,6 +555,7 @@ public void remove(Object entity) {
 ```
 
 **PersistenceContext.removeEntity() 개선**:
+
 ```java
 public void removeEntity(Object entity) {
     EntityEntry entry = entityEntries.get(entity);
@@ -550,6 +573,7 @@ public void removeEntity(Object entity) {
 ```
 
 **ActionQueue.executeActions() 개선**:
+
 ```java
 public void executeActions(JdbcExecutor executor,
                            MetadataRegistry registry,
@@ -578,11 +602,14 @@ public void executeActions(JdbcExecutor executor,
 - [ ] 트랜잭션 커밋 시 자동 flush
 
 **주요 변경사항**:
+
 - EntityManager.flush() 완전 구현
 - EntityTransaction.commit() 시 자동 flush
 
 **EntityManager.flush() 완성**:
+
 ```java
+
 @Override
 public void flush() {
     checkOpen();
@@ -599,7 +626,9 @@ public void flush() {
 ```
 
 **EntityTransaction.commit() 개선**:
+
 ```java
+
 @Override
 public void commit() {
     if (!active) {
@@ -631,13 +660,16 @@ public void commit() {
 - [ ] 에러 메시지 개선
 
 **주요 예외 상황**:
+
 - 트랜잭션 없이 persist/remove 호출
 - 이미 관리 중인 엔티티 persist
 - 관리되지 않는 엔티티 remove
 - ID가 없는 엔티티 merge
 
 **예시**:
+
 ```java
+
 @Override
 public void persist(Object entity) {
     checkOpen();
@@ -649,13 +681,13 @@ public void persist(Object entity) {
 
     if (persistenceContext.contains(entity)) {
         throw new IllegalArgumentException(
-            "Entity is already managed: " + entity);
+                "Entity is already managed: " + entity);
     }
 
     EntityMetadata metadata = metadataRegistry.getMetadata(entity.getClass());
     if (metadata == null) {
         throw new IllegalArgumentException(
-            "Not an entity: " + entity.getClass().getName());
+                "Not an entity: " + entity.getClass().getName());
     }
 
     persistenceContext.addInsertAction(entity, metadata);
@@ -664,7 +696,7 @@ public void persist(Object entity) {
 private void requireActiveTransaction() {
     if (!transaction.isActive()) {
         throw new IllegalStateException(
-            "No active transaction. Call transaction.begin() first.");
+                "No active transaction. Call transaction.begin() first.");
     }
 }
 ```
@@ -729,6 +761,7 @@ simple-jpa/
 ## 핵심 통합 플로우
 
 ### persist() 전체 플로우
+
 ```
 em.persist(user)
     ↓
@@ -755,6 +788,7 @@ DB에 INSERT 실행
 ```
 
 ### find() 전체 플로우
+
 ```
 em.find(User.class, 1L)
     ↓
@@ -778,6 +812,7 @@ PersistenceContext.addEntity()
 ```
 
 ### Dirty Checking & UPDATE 플로우
+
 ```
 User user = em.find(User.class, 1L)  // 스냅샷 저장
     ↓
@@ -805,6 +840,7 @@ DB에 UPDATE 실행
 ```
 
 ### remove() 전체 플로우
+
 ```
 em.remove(user)
     ↓
@@ -835,21 +871,25 @@ DB에서 DELETE 실행
 ## 핵심 설계 원칙
 
 ### 1. 책임 분리 (Single Responsibility)
+
 - 각 Persister는 하나의 작업만 담당
 - SQL 생성은 Generator에 위임
 - JDBC 실행은 Executor에 위임
 
 ### 2. 영속성 컨텍스트와의 긴밀한 통합
+
 - 모든 작업은 영속성 컨텍스트를 통해 수행
 - 1차 캐시 자동 관리
 - 스냅샷 자동 생성 및 갱신
 
 ### 3. 쓰기 지연 유지
+
 - persist/remove는 즉시 실행하지 않음
 - ActionQueue에 추가만
 - flush 시점에 일괄 실행
 
 ### 4. 자동 변경 감지
+
 - 명시적 update() 호출 불필요
 - flush 시 자동으로 Dirty Checking
 - 변경된 필드만 UPDATE
@@ -859,23 +899,27 @@ DB에서 DELETE 실행
 ## Phase 6 완료 후 가능한 것
 
 ✅ **완전한 CRUD 작업**:
+
 - `persist()` - 엔티티 저장
 - `find()` - 엔티티 조회 (1차 캐시 포함)
 - `merge()` - 준영속 엔티티 병합
 - `remove()` - 엔티티 삭제
 
 ✅ **영속성 컨텍스트 기능**:
+
 - 1차 캐시를 통한 성능 최적화
 - 동일성 보장 (== 비교)
 - 쓰기 지연 (Write-Behind)
 - 자동 변경 감지 (Dirty Checking)
 
 ✅ **트랜잭션 관리**:
+
 - 트랜잭션 내 작업 보장
 - 커밋 시 자동 flush
 - 롤백 시 영속성 컨텍스트 초기화
 
 **아직 안 되는 것**:
+
 - JPQL 쿼리 (Phase 7)
 - 관계 매핑 (Phase 8)
 - 지연 로딩 (Phase 9)
@@ -886,6 +930,7 @@ DB에서 DELETE 실행
 ## 다음 단계 (Phase 7 예고)
 
 Phase 7에서는 **JPQL 쿼리 처리**를 구현합니다:
+
 - JPQL 파서 (간단한 SELECT만)
 - JPQL → SQL 변환
 - `Query` 인터페이스
@@ -897,18 +942,20 @@ Phase 7에서는 **JPQL 쿼리 처리**를 구현합니다:
 ## 테스트 전략
 
 ### 단위 테스트
+
 - **EntityPersisterTest**: INSERT 로직 검증
 - **EntityLoaderTest**: SELECT 로직 검증
 - **EntityUpdaterTest**: UPDATE 로직 검증
 - **EntityDeleterTest**: DELETE 로직 검증
 
 ### 통합 테스트
+
 - **CrudIntegrationTest**:
-  - persist → find 시나리오
-  - Dirty Checking → 자동 UPDATE
-  - remove → flush 시나리오
-  - 1차 캐시 동작 검증
-  - 트랜잭션 롤백 시나리오
+    - persist → find 시나리오
+    - Dirty Checking → 자동 UPDATE
+    - remove → flush 시나리오
+    - 1차 캐시 동작 검증
+    - 트랜잭션 롤백 시나리오
 
 ---
 
@@ -920,54 +967,88 @@ EntityManagerFactory emf = Persistence.createEntityManagerFactory(config);
 EntityManager em = emf.createEntityManager();
 EntityTransaction tx = em.getTransaction();
 
-try {
-    tx.begin();
+try{
+        tx.
 
-    // === 1. persist (INSERT) ===
-    User user = new User("John", "john@email.com");
-    em.persist(user);
-    // 아직 DB에 저장 안 됨, ActionQueue에만 추가
-    System.out.println("User ID before flush: " + user.getId()); // null
+begin();
 
-    em.flush();
-    // 이제 DB에 저장됨
-    System.out.println("User ID after flush: " + user.getId()); // 1
+// === 1. persist (INSERT) ===
+User user = new User("John", "john@email.com");
+    em.
 
-    // === 2. find (SELECT) ===
-    User foundUser = em.find(User.class, user.getId());
-    assert foundUser == user; // 동일성 보장 (1차 캐시)
+persist(user);
+// 아직 DB에 저장 안 됨, ActionQueue에만 추가
+    System.out.
 
-    // === 3. Dirty Checking (자동 UPDATE) ===
-    foundUser.setName("John Updated");
-    // em.update() 같은 메서드 호출 불필요!
+println("User ID before flush: "+user.getId()); // null
 
-    em.flush();
-    // UPDATE users SET name = 'John Updated' WHERE id = 1
-    // 자동으로 UPDATE 실행됨!
+        em.
 
-    // === 4. merge (준영속 엔티티 병합) ===
-    em.clear(); // 영속성 컨텍스트 초기화
-    User detachedUser = new User(1L, "John Merged", "john@email.com");
-    User mergedUser = em.merge(detachedUser);
-    // DB에서 로드 → 필드 복사 → Dirty Checking → UPDATE
+flush();
+// 이제 DB에 저장됨
+    System.out.
 
-    // === 5. remove (DELETE) ===
-    em.remove(mergedUser);
-    // 아직 DB에서 삭제 안 됨, ActionQueue에만 추가
+println("User ID after flush: "+user.getId()); // 1
 
-    assert !em.contains(mergedUser); // 더 이상 관리되지 않음
+// === 2. find (SELECT) ===
+User foundUser = em.find(User.class, user.getId());
+    assert foundUser ==user; // 동일성 보장 (1차 캐시)
 
-    tx.commit(); // 자동 flush → DELETE 실행
-    // DELETE FROM users WHERE id = 1
+// === 3. Dirty Checking (자동 UPDATE) ===
+    foundUser.
 
-} catch (Exception e) {
-    if (tx.isActive()) {
-        tx.rollback();
+setName("John Updated");
+// em.update() 같은 메서드 호출 불필요!
+
+    em.
+
+flush();
+// UPDATE users SET name = 'John Updated' WHERE id = 1
+// 자동으로 UPDATE 실행됨!
+
+// === 4. merge (준영속 엔티티 병합) ===
+    em.
+
+clear(); // 영속성 컨텍스트 초기화
+
+User detachedUser = new User(1L, "John Merged", "john@email.com");
+User mergedUser = em.merge(detachedUser);
+// DB에서 로드 → 필드 복사 → Dirty Checking → UPDATE
+
+// === 5. remove (DELETE) ===
+    em.
+
+remove(mergedUser);
+// 아직 DB에서 삭제 안 됨, ActionQueue에만 추가
+
+    assert!em.
+
+contains(mergedUser); // 더 이상 관리되지 않음
+
+    tx.
+
+commit(); // 자동 flush → DELETE 실행
+// DELETE FROM users WHERE id = 1
+
+}catch(
+Exception e){
+        if(tx.
+
+isActive()){
+        tx.
+
+rollback();
     }
-    e.printStackTrace();
-} finally {
-    em.close();
-    emf.close();
+            e.
+
+printStackTrace();
+}finally{
+        em.
+
+close();
+    emf.
+
+close();
 }
 ```
 
@@ -976,18 +1057,21 @@ try {
 ## Phase 6 핵심 체크리스트
 
 ### EntityLoader
+
 - [ ] load() 메서드 구현
 - [ ] ResultSet → Entity 변환
 - [ ] 리플렉션으로 객체 생성 및 필드 설정
 - [ ] find()와 통합
 
 ### EntityPersister
+
 - [ ] insert() 메서드 구현
 - [ ] 생성된 ID 자동 설정
 - [ ] InsertAction과 통합
 - [ ] persist()와 통합
 
 ### EntityUpdater
+
 - [ ] update() 메서드 구현
 - [ ] 변경된 필드만 UPDATE
 - [ ] 스냅샷 갱신
@@ -995,17 +1079,20 @@ try {
 - [ ] merge() 구현
 
 ### EntityDeleter
+
 - [ ] delete() 메서드 구현
 - [ ] DeleteAction과 통합
 - [ ] remove()와 통합
 - [ ] 1차 캐시에서 제거
 
 ### flush() 완성
+
 - [ ] Dirty Checking 자동 수행
 - [ ] ActionQueue 실행
 - [ ] 트랜잭션 커밋 시 자동 flush
 
 ### 예외 처리
+
 - [ ] 엔티티 상태 검증
 - [ ] 트랜잭션 필수 체크
 - [ ] 명확한 에러 메시지
