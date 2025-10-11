@@ -31,11 +31,11 @@ public interface TypedQuery<T> {
 ```
 
 ### Step 7.2: JPQL 파서 (간단한 SELECT만)
-- [ ] JpqlParser 클래스 구현
-- [ ] SELECT 절 파싱
-- [ ] FROM 절 파
-- [ ] WHERE 절 파싱 (간단한 조건만)
-- [ ] AST(Abstract Syntax Tree) 구조 정의
+- [x] JpqlParser 클래스 구현
+- [x] SELECT 절 파싱
+- [x] FROM 절 파
+- [x] WHERE 절 파싱 (간단한 조건만)
+- [x] AST(Abstract Syntax Tree) 구조 정의
 
 **지원 범위 (Phase 7)**:
 ```sql
