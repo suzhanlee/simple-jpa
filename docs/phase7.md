@@ -8,10 +8,10 @@
 ## 구현 단계
 
 ### Step 7.1: Query 인터페이스 설계
-- [ ] Query 인터페이스 정의
-- [ ] TypedQuery 인터페이스 정의 (제네릭 타입 안전성)
-- [ ] QueryImpl 기본 구현체
-- [ ] TypedQueryImpl 기본 구현체
+- [x] Query 인터페이스 정의
+- [x] TypedQuery 인터페이스 정의 (제네릭 타입 안전성)
+- [x] QueryImpl 기본 구현체
+- [x] TypedQueryImpl 기본 구현체
 
 **핵심 메서드**:
 ```java
@@ -33,7 +33,7 @@ public interface TypedQuery<T> {
 ### Step 7.2: JPQL 파서 (간단한 SELECT만)
 - [ ] JpqlParser 클래스 구현
 - [ ] SELECT 절 파싱
-- [ ] FROM 절 파싱
+- [ ] FROM 절 파
 - [ ] WHERE 절 파싱 (간단한 조건만)
 - [ ] AST(Abstract Syntax Tree) 구조 정의
 
