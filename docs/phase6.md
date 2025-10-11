@@ -477,10 +477,10 @@ private void copyFields(Object source, Object target, EntityMetadata metadata) {
 
 ### Step 6.4: EntityDeleter (DELETE 구현)
 
-- [ ] EntityDeleter 클래스 구현
-- [ ] DELETE SQL 실행
-- [ ] 영속성 컨텍스트에서 제거
-- [ ] DeleteAction과 통합
+- [x] EntityDeleter 클래스 구현
+- [x] DELETE SQL 실행
+- [x] 영속성 컨텍스트에서 제거
+- [x] DeleteAction과 통합
 
 **주요 컴포넌트**:
 

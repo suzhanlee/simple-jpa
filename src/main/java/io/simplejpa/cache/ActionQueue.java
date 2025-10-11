@@ -9,6 +9,7 @@ import io.simplejpa.engine.sql.DeleteSqlGenerator;
 import io.simplejpa.engine.sql.InsertSqlGenerator;
 import io.simplejpa.engine.sql.UpdateSqlGenerator;
 import io.simplejpa.metadata.MetadataRegistry;
+import io.simplejpa.persister.EntityDeleter;
 import io.simplejpa.persister.EntityPersister;
 import io.simplejpa.persister.EntityUpdater;
 import lombok.extern.slf4j.Slf4j;
@@ -30,6 +31,7 @@ public class ActionQueue {
     private final JdbcExecutor jdbcExecutor;
     private final EntityPersister entityPersister;
     private final EntityUpdater entityUpdater;
+    private final EntityDeleter entityDeleter;
 
     public ActionQueue(
             MetadataRegistry metadataRegistry,
@@ -38,7 +40,8 @@ public class ActionQueue {
             DeleteSqlGenerator deleteSqlGenerator,
             JdbcExecutor jdbcExecutor,
             EntityPersister entityPersister,
-            EntityUpdater entityUpdater
+            EntityUpdater entityUpdater,
+            EntityDeleter entityDeleter
     ) {
         this.metadataRegistry = metadataRegistry;
         this.insertSqlGenerator = insertSqlGenerator;
@@ -47,6 +50,7 @@ public class ActionQueue {
         this.jdbcExecutor = jdbcExecutor;
         this.entityPersister = new EntityPersister(jdbcExecutor, insertSqlGenerator, metadataRegistry);
         this.entityUpdater = new EntityUpdater(metadataRegistry, updateSqlGenerator, jdbcExecutor);
+        this.entityDeleter = new EntityDeleter(metadataRegistry, deleteSqlGenerator, jdbcExecutor);
     }
 
     public void addInsertion(Object entity) {
@@ -54,20 +58,11 @@ public class ActionQueue {
     }
 
     public void addUpdate(Object entity, EntityEntry entityEntry) {
-        updates.add(new UpdateAction(
-                entity,
-                entityEntry,
-                entityUpdater
-        ));
+        updates.add(new UpdateAction(entity, entityEntry, entityUpdater));
     }
 
     public void addDeletion(Object entity) {
-        deletions.add(new DeleteAction(
-                entity,
-                deleteSqlGenerator,
-                metadataRegistry.getMetadata(entity.getClass()),
-                jdbcExecutor
-        ));
+        deletions.add(new DeleteAction(entity, entityDeleter));
     }
 
     public void executeActions(Connection connection) {
