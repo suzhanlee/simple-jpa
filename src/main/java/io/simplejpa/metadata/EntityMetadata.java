@@ -1,8 +1,10 @@
 package io.simplejpa.metadata;
 
+import io.simplejpa.metadata.relation.RelationShipMetadata;
 import lombok.Getter;
 
 import java.util.List;
+import java.util.Map;
 
 @Getter
 public class EntityMetadata {
@@ -13,8 +15,18 @@ public class EntityMetadata {
     private final String catalogName;
     private final IdentifierMetadata identifierMetadata;
     private final List<AttributeMetadata> attributeMetadatas;
+    private final Map<String, RelationShipMetadata> relationShips;
 
-    public EntityMetadata(Class<?> entityClass, String entityName, String tableName, String schemaName, String catalogName, IdentifierMetadata identifierMetadata, List<AttributeMetadata> attributeMetadatas) {
+    public EntityMetadata(
+            Class<?> entityClass,
+            String entityName,
+            String tableName,
+            String schemaName,
+            String catalogName,
+            IdentifierMetadata identifierMetadata,
+            List<AttributeMetadata> attributeMetadatas,
+            Map<String, RelationShipMetadata> relationShips
+    ) {
         this.entityClass = entityClass;
         this.entityName = entityName;
         this.tableName = tableName;
@@ -22,6 +34,7 @@ public class EntityMetadata {
         this.catalogName = catalogName;
         this.identifierMetadata = identifierMetadata;
         this.attributeMetadatas = attributeMetadatas;
+        this.relationShips = relationShips;
     }
 
     public AttributeMetadata getAttributeMetadata(String fieldName) {
