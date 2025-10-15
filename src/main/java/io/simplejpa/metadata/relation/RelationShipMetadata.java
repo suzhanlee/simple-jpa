@@ -12,4 +12,24 @@ public class RelationShipMetadata {
     private String foreignKeyColumn;
     private String mappedBy;
     private JoinTableMetadata joinTableMetadata;
+
+    public RelationShipMetadata(
+            RelationType relationType,
+            Class<?> targetEntityClass,
+            String fieldName,
+            FetchType fetchType,
+            CascadeType[] cascadeTypes,
+            String foreignKeyColumn,
+            String mappedBy,
+            JoinTableMetadata joinTableMetadata
+    ) {
+        this.relationType = relationType;
+        this.targetEntityClass = targetEntityClass;
+        this.fieldName = fieldName;
+        this.fetchType = fetchType;
+        this.cascadeTypes = cascadeTypes;
+        this.foreignKeyColumn = foreignKeyColumn;
+        this.mappedBy = mappedBy;
+        this.joinTableMetadata = joinTableMetadata;
+    }
 }

@@ -70,11 +70,11 @@ public class RelationshipMetadata {
 ```
 
 ### Step 8.3: 관계 매핑 메타데이터 추출
-- [ ] AnnotationProcessor에 관계 애노테이션 처리 추가
-- [ ] 외래키 정보 추출
-- [ ] 양방향 관계 검증 (mappedBy 일관성)
-- [ ] 다대다 중간 테이블 정보 추출
-- [ ] MetadataRegistry에 관계 정보 저장
+- [x] AnnotationProcessor에 관계 애노테이션 처리 추가
+- [x] 외래키 정보 추출
+- [x] 양방향 관계 검증 (mappedBy 일관성)
+- [x] 다대다 중간 테이블 정보 추출
+- [x] MetadataRegistry에 관계 정보 저장
 
 **처리 예시**:
 ```java
