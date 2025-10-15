@@ -8,14 +8,14 @@
 ## 구현 단계
 
 ### Step 8.1: 관계 매핑 애노테이션 정의
-- [ ] @OneToOne 애노테이션
-- [ ] @ManyToOne 애노테이션
-- [ ] @OneToMany 애노테이션
-- [ ] @ManyToMany 애노테이션
-- [ ] @JoinColumn 애노테이션 (외래키 지정)
-- [ ] @JoinTable 애노테이션 (다대다 중간 테이블)
-- [ ] FetchType 열거형 (EAGER, LAZY)
-- [ ] CascadeType 열거형 (PERSIST, MERGE, REMOVE, REFRESH, DETACH, ALL)
+- [x] @OneToOne 애노테이션
+- [x] @ManyToOne 애노테이션
+- [x] @OneToMany 애노테이션
+- [x] @ManyToMany 애노테이션
+- [x] @JoinColumn 애노테이션 (외래키 지정) 
+- [x] @JoinTable 애노테이션 (다대다 중간 테이블)
+- [x] FetchType 열거형 (EAGER, LAZY)
+- [x] CascadeType 열거형 (PERSIST, MERGE, REMOVE, REFRESH, DETACH, ALL)
 
 **애노테이션 설계**:
 ```java
