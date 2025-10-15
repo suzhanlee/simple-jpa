@@ -43,11 +43,11 @@ public @interface JoinColumn {
 ```
 
 ### Step 8.2: RelationshipMetadata 구조 설계
-- [ ] RelationshipMetadata 클래스
-- [ ] RelationType 열거형 (ONE_TO_ONE, MANY_TO_ONE, ONE_TO_MANY, MANY_TO_MANY)
-- [ ] ForeignKeyMetadata 클래스
-- [ ] JoinTableMetadata 클래스 (ManyToMany용)
-- [ ] EntityMetadata에 관계 정보 통합
+- [x] RelationshipMetadata 클래스
+- [x] RelationType 열거형 (ONE_TO_ONE, MANY_TO_ONE, ONE_TO_MANY, MANY_TO_MANY)
+- [x] ForeignKeyMetadata 클래스
+- [x] JoinTableMetadata 클래스 (ManyToMany용)
+- [x] EntityMetadata에 관계 정보 통합
 
 **메타데이터 구조**:
 ```java
